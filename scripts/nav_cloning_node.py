@@ -47,8 +47,7 @@ class cource_following_learning_node:
         self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.srv = rospy.Service('/training', SetBool, self.callback_dl_training)
         self.pose_sub = rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, self.callback_pose)
-        self.path_pub = rospy.Publisher("/path", Path, queue_size=10)
-        # self.path_pub = rospy.Publisher("move_base_simple/goal", PoseStamped, queue_size=10)
+        # self.path_pub = rospy.Publisher("/path", Path, queue_size=10)
         # self.path_sub = rospy.Subscriber("/move_base/NavfnROS/plan", Path, self.callback_path)
         # self.waypoint_sub = rospy.Subscriber("/count_waypoint", Int8, self.callback_waypoint)
         # self.current_waypoint = rospy.Subscriber("/current_waypoints", Int8, self.callback_waypoint)
@@ -100,18 +99,6 @@ class cource_following_learning_node:
             writer = csv.writer(f, lineterminator='\n')
             writer.writerow(['step', 'mode', 'loss', 'angle_error(rad)', 'distance(m)'])
 
-        with open(self.path + 'analysis/path/path_comp5.csv', 'r') as f:
-            for row in f:
-                target_pose = PoseStamped()
-                self.path_list.append(row)
-                x, y = (','.join(self.path_list[self.count].splitlines())).split(',')
-                target_pose.pose.position.x = float(x)
-                target_pose.pose.position.y = float(y)
-                self.target_path.poses.append(target_pose)
-                self.count += 1
-            # print(self.target_path)
-        self.path_pub.publish(self.target_path)
-
         # with open(self.path + 'analysis/path/path_comp5.csv', 'r') as f:
         #     for row in f:
         #         target_pose = PoseStamped()
@@ -119,11 +106,10 @@ class cource_following_learning_node:
         #         x, y = (','.join(self.path_list[self.count].splitlines())).split(',')
         #         target_pose.pose.position.x = float(x)
         #         target_pose.pose.position.y = float(y)
-        #         target_pose.pose.orientation.w = 1.0
-        #         # self.target_path.poses.append(target_pose)
+        #         self.target_path.poses.append(target_pose)
         #         self.count += 1
         #     # print(self.target_path)
-        # self.path_pub.publish(target_pose)
+        # self.path_pub.publish(self.target_path)
 
     def callback(self, data):
         try:
@@ -244,7 +230,7 @@ class cource_following_learning_node:
         print('Moving_pose:', x, y, theta)
         return x, y, theta
 
-
+    
 
     def robot_moving(self, x, y, angle):
         #amcl
@@ -301,8 +287,6 @@ class cource_following_learning_node:
             self.capture_rate.sleep()
 
     def loop(self):
-        
-        self.path_pub.publish(self.target_path)
         if self.cv_image.size != 640 * 480 * 3:
             return
         if self.cv_left_image.size != 640 * 480 * 3:
@@ -332,11 +316,11 @@ class cource_following_learning_node:
         ros_time = str(rospy.Time.now())
 
 
-        if self.episode == 1000:
-            self.learning = False
+        # if self.episode == 1000:
+        #     self.learning = False
             #self.dl.save(self.save_path)
             #self.dl.load(self.load_path)
-            sys.exit()
+            # sys.exit()
 
         if self.learning:
             target_action = self.action
@@ -415,6 +399,7 @@ class cource_following_learning_node:
                 writer.writerow(line)
             self.vel.linear.x = 0.0
             self.vel.angular.z = target_action
+            self.vel.angular.z = 0
             self.nav_pub.publish(self.vel)
 
         else:
@@ -435,6 +420,8 @@ class cource_following_learning_node:
         cv2.imshow("Resized Left Image", temp)
         temp = copy.deepcopy(img_right)
         cv2.imshow("Resized Right Image", temp)
+        temp = copy.deepcopy(img)
+        cv2.imshow("Resized Image", temp)
         cv2.waitKey(1)
 
 if __name__ == '__main__':
