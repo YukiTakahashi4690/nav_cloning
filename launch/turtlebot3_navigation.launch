@@ -9,6 +9,8 @@
   <arg name="dist_err" default="1.0"/>
   <arg name="initial_pose_x" default="-10.78" />
   <arg name="initial_pose_y" default="-16.78" />
+  <!-- <arg name="initial_pose_x" default="0.390213" />
+  <arg name="initial_pose_y" default="1.928858" /> -->
   <arg name="initial_pose_a" default="0.0" />
   <arg name="use_waypoint_nav" default="true" />
   <arg name="rate" default="3.0"/>
@@ -23,11 +25,15 @@
   <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
 
   <!-- AMCL -->
-  <include file="$(find turtlebot3_navigation)/launch/amcl.launch">
+  <!-- <include file="$(find turtlebot3_navigation)/launch/amcl.launch">
     <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
     <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
     <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
-  </include>
+  </include> -->
+
+  <node name="fake_localization" pkg="fake_localization" type="fake_localization" output="screen">
+      <remap from="base_pose_ground_truth" to="odom"/>
+  </node>
 
   <!-- move_base -->
   <include file="$(find turtlebot3_navigation)/launch/move_base.launch">

@@ -66,11 +66,11 @@ class cource_following_learning_node:
         self.g_pos = PoseStamped()
         self.orientation = 0
         self.r = rospy.Rate(10)
-        self.capture_rate = rospy.Rate(0.3)
+        self.capture_rate = rospy.Rate(0.5)
         rospy.wait_for_service('/gazebo/set_model_state')
         self.state = ModelState()
         self.state.model_name = 'mobile_base'
-        self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=100)
+        self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
         self.count = 0
         # self.simple_goal_sub = rospy.Subscriber("move_base_simple/goal", PoseStamped, self.callback_simple_goal)
         self.simple_goal_pub = rospy.Publisher('move_base_simple/goal', PoseStamped, queue_size=10)
@@ -108,7 +108,7 @@ class cource_following_learning_node:
             x = float(pos[1])
             y = float(pos[2])
             theta = float(pos[3])
-            print('Moving_pose:', x, y, theta)
+            # print('Moving_pose:', x, y, theta)
             return x, y, theta
 
     def simple_goal(self):
@@ -118,7 +118,7 @@ class cource_following_learning_node:
             # goal_pos1 = self.goal_list1[self.save_img_no]
             # self.goal_img_no1 += 1
 
-            fs = open(self.csv_path + 'simple_goal_org.csv', 'r')
+            fs = open(self.csv_path + 'simple_goal.csv', 'r')
             for row in fs:
                 self.goal_list2.append(row)
             goal_pos2 = self.goal_list2[self.save_img_no1]
@@ -129,8 +129,8 @@ class cource_following_learning_node:
             self.g_pos.header.stamp = rospy.Time.now()
 
             self.g_pos.header.frame_id = 'map'
-            self.g_pos.pose.position.x = x - 9.821
-            self.g_pos.pose.position.y = y - 16.1
+            self.g_pos.pose.position.x = x - 11.252
+            self.g_pos.pose.position.y = y - 16.70
             self.g_pos.pose.position.z = 0
 
             self.g_pos.pose.orientation.x = 0 
@@ -151,17 +151,23 @@ class cource_following_learning_node:
             #amcl
             #replace_pose = PoseWithCovarianceStamped()
 
-            self.pos.header.frame_id = 'odom'
-            self.pos.pose.pose.position.x = x - 9.821
-            self.pos.pose.pose.position.y = y - 16.1
+            self.pos.header.stamp = rospy.Time.now()
 
-            self.pos.pose.pose.orientation.x = 0 
-            self.pos.pose.pose.orientation.y = 0
-            self.pos.pose.pose.orientation.z = 0
-            self.pos.pose.pose.orientation.w = 0 
-            self.pos.pose.covariance = [0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
+            self.pos.header.frame_id = 'map'
+            self.pos.pose.pose.position.x = x - 11.252
+            self.pos.pose.pose.position.y = y - 16.70
+
+            quaternion_ = tf.transformations.quaternion_from_euler(0, 0, angle)
+
+            self.pos.pose.pose.orientation.x = quaternion_[0]
+            self.pos.pose.pose.orientation.y = quaternion_[1]
+            self.pos.pose.pose.orientation.z = quaternion_[2]
+            self.pos.pose.pose.orientation.w = quaternion_[3]
+            # self.pos.pose.covariance = [0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
             
-            self.amcl_pose_pub.publish(self.pos)
+            self.pos.pose.covariance = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
+
+            # self.amcl_pose_pub.publish(self.pos)
             #gazebo
             for offset_ang in [-5, 0, 5]:
                 the = angle + math.radians(offset_ang)
@@ -174,9 +180,16 @@ class cource_following_learning_node:
                 self.state.pose.orientation.y = quaternion[1]
                 self.state.pose.orientation.z = quaternion[2]
                 self.state.pose.orientation.w = quaternion[3]
+
                 try:
                     set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
                     resp = set_state( self.state )
+                    
+                    if offset_ang == -5:
+                        self.amcl_pose_pub.publish(self.pos)
+                        if self.save_img_no % 7 == 0:
+                            self.amcl_pose_pub.publish(self.pos)
+
                     #test
                     self.capture_img()
                     self.capture_ang()
@@ -185,6 +198,11 @@ class cource_following_learning_node:
                 self.r.sleep()
                 self.r.sleep()
                 self.r.sleep()
+            
+            self.r.sleep()
+            self.r.sleep()
+            self.r.sleep()
+        
 
     def goal_pub(self, data):
         rospy.wait_for_service('/goal_pub')
@@ -199,13 +217,13 @@ class cource_following_learning_node:
         service = rospy.ServiceProxy('/collect_data', Trigger)
 
         for i in range(903):
-            self.capture_img()
-            self.capture_ang()
             x, y, theta = self.read_csv()
             self.robot_moving(x, y, theta)
             print("current_position:", x, y, theta)
 
             self.save_img_no += 1
+            # if self.save_img_no == 7:
+            #     self.save_img_no = 0
             self.capture_rate.sleep()
 
     def callback(self, data):
