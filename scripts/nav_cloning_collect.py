@@ -57,7 +57,8 @@ class cource_following_learning_node:
         self.goal_pub_srv = rospy.Service('/goal_pub', Trigger, self.goal_pub)
         self.save_img_no = 0
         self.save_img_no1= 0
-        self.goal_img_no2 = 0
+        self.save_img_no2 = 0
+        self.goal_img_no1 = 0
         self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/analysis/'
         self.pos_list = []
         self.goal_list1 = []
@@ -72,6 +73,7 @@ class cource_following_learning_node:
         self.state.model_name = 'mobile_base'
         self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
         self.count = 0
+        self.offset_ang = 1
         # self.simple_goal_sub = rospy.Subscriber("move_base_simple/goal", PoseStamped, self.callback_simple_goal)
         self.simple_goal_pub = rospy.Publisher('move_base_simple/goal', PoseStamped, queue_size=10)
         os.makedirs(self.path + self.start_time)
@@ -112,12 +114,6 @@ class cource_following_learning_node:
             return x, y, theta
 
     def simple_goal(self):
-            # ft = open(self.csv_path + 'traceable_pos.csv', 'r')
-            # for row in ft:
-            #     self.goal_list1.append(row)
-            # goal_pos1 = self.goal_list1[self.save_img_no]
-            # self.goal_img_no1 += 1
-
             fs = open(self.csv_path + 'simple_goal.csv', 'r')
             for row in fs:
                 self.goal_list2.append(row)
@@ -136,16 +132,9 @@ class cource_following_learning_node:
             self.g_pos.pose.orientation.x = 0 
             self.g_pos.pose.orientation.y = 0
             self.g_pos.pose.orientation.z = 0
-            self.g_pos.pose.orientation.w = 1.0
+            self.g_pos.pose.orientation.w = 0.999
 
             self.simple_goal_pub.publish(self.g_pos)
-
-            # self.goal_img_no2 += 1
-            
-            # if self.goal_img_no2 == 1:
-            #     # print('curent_position:', x, y)
-            #     self.simple_goal_pub.publish(self.g_pos)
-            #     self.goal_img_no2 = 0
 
     def robot_moving(self, x, y, angle):
             #amcl
@@ -163,14 +152,14 @@ class cource_following_learning_node:
             self.pos.pose.pose.orientation.y = quaternion_[1]
             self.pos.pose.pose.orientation.z = quaternion_[2]
             self.pos.pose.pose.orientation.w = quaternion_[3]
-            # self.pos.pose.covariance = [0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
+            self.pos.pose.covariance = [0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
             
-            self.pos.pose.covariance = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
+            # self.pos.pose.covariance = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
 
             # self.amcl_pose_pub.publish(self.pos)
             #gazebo
-            for offset_ang in [-5, 0, 5]:
-                the = angle + math.radians(offset_ang)
+            for self.offset_ang in [-5, 0, 5]:
+                the = angle + math.radians(self.offset_ang)
                 the = the - 2.0 * math.pi if the >  math.pi else the
                 the = the + 2.0 * math.pi if the < -math.pi else the
                 self.state.pose.position.x = x
@@ -184,8 +173,33 @@ class cource_following_learning_node:
                 try:
                     set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
                     resp = set_state( self.state )
+                    self.goal_img_no1 += 1
+                    print("goal_img_no:", self.goal_img_no1)
+
+                    if self.offset_ang == 0 and self.goal_img_no1 == 11:
+                        self.save_img_no1 += 1
+                        self.simple_goal()
+
+                    if self.offset_ang == 0 and self.goal_img_no1 == 137:
+                        self.save_img_no1 += 1
+                        self.simple_goal()
+
+                    if self.offset_ang == 0 and self.goal_img_no1 == 291:
+                        self.simple_goal()
+
+                    if self.offset_ang == 0 and self.goal_img_no1 == 403:
+                        self.simple_goal()
+
+                    if self.offset_ang == 0 and self.goal_img_no1 == 578:
+                        self.simple_goal()
+
+                    if self.offset_ang == 0 and self.goal_img_no1 == 711:
+                        self.simple_goal()
+
+                    if self.offset_ang == 0 and self.goal_img_no1 == 886:
+                        self.simple_goal()
                     
-                    if offset_ang == -5:
+                    if self.offset_ang == -5:
                         self.amcl_pose_pub.publish(self.pos)
                         if self.save_img_no % 7 == 0:
                             self.amcl_pose_pub.publish(self.pos)
@@ -204,15 +218,13 @@ class cource_following_learning_node:
             self.r.sleep()
         
 
-    def goal_pub(self, data):
+    def goal_pub(self):
         rospy.wait_for_service('/goal_pub')
         service = rospy.ServiceProxy('/goal_pub', Trigger)
-
-        # for i in range(903):
         self.simple_goal()
-        self.save_img_no1 += 1
     
     def collect_data(self, data):
+        self.goal_pub()
         rospy.wait_for_service('/collect_data')
         service = rospy.ServiceProxy('/collect_data', Trigger)
 
