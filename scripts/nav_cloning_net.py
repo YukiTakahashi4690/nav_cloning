@@ -52,6 +52,7 @@ class deep_learning:
         self.data = []
         self.target_angles = []
 
+
     def act_and_trains(self, imgobj, target_angle):
             x = [self.phi(s) for s in [imgobj]]
             t = np.array([target_angle], np.float32)
@@ -82,37 +83,34 @@ class deep_learning:
                 action_value = self.net(x_test)
             return action_value.data[0][0], loss_train.array
 
-    # def make_dataset(self, imgobj, target_angle):
-    #         x = [self.phi(s) for s in [imgobj]]
-    #         t = np.array([target_angle], np.float32)
-    #         self.data.append(x[0])
-    #         self.target_angles.append(t[0])
-    #         if len(self.data) > MAX_DATA:
-    #             del self.data[0]
-    #             del self.target_angles[0]
-    #         dataset = TupleDataset(self.data, self.target_angles)
+    def make_dataset(self, imgobj, target_angle):
+            x = [self.phi(s) for s in [imgobj]]
+            t = np.array([target_angle], np.float32)
+            self.data.append(x[0])
+            self.target_angles.append(t[0])
+            self.dataset = TupleDataset(self.data, self.target_angles)
 
-    # def trains(dataset):
-    #         train_iter = SerialIterator(dataset, batch_size = BATCH_SIZE, repeat=True, shuffle=False)
-    #         train_batch  = train_iter.next()
-    #         x_train, t_train = chainer.dataset.concat_examples(train_batch, -1)
+    def trains(self):
+            train_iter = SerialIterator(self.dataset, batch_size = BATCH_SIZE, repeat=True, shuffle=True)
+            train_batch  = train_iter.next()
+            x_train, t_train = chainer.dataset.concat_examples(train_batch, -1)
 
-    #         y_train = self.net(x_train)
-    #         loss_train = F.mean_squared_error(y_train, Variable(t_train.reshape(BATCH_SIZE, 1)))
+            y_train = self.net(x_train)
+            loss_train = F.mean_squared_error(y_train, Variable(t_train.reshape(BATCH_SIZE, 1)))
 
-    #         self.loss_list.append(loss_train.array)
+            self.loss_list.append(loss_train.array)
 
-    #         self.net.cleargrads()
-    #         loss_train.backward()
-    #         self.optimizer.update()
+            self.net.cleargrads()
+            loss_train.backward()
+            self.optimizer.update()
             
-    #         self.count += 1
+            self.count += 1
 
-    #         self.results_train['loss'] .append(loss_train.array)
-    #         x_test = chainer.dataset.concat_examples(x, -1)
-    #         with chainer.using_config('train', False), chainer.using_config('enable_backprop', False):
-    #             action_value = self.net(x_test)
-    #         return action_value.data[0][0], loss_train.array
+            self.results_train['loss'] .append(loss_train.array)
+            # x_test = chainer.dataset.concat_examples(x, -1)
+            # with chainer.using_config('train', False), chainer.using_config('enable_backprop', False):
+            #     action_value = self.net(x_test)
+            return loss_train.array
     
     
     def act(self, imgobj):

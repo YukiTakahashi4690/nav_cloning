@@ -42,11 +42,9 @@ class cource_following_learning_node:
         self.vel_sub = rospy.Subscriber("/nav_vel", Twist, self.callback_vel)
         self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
         self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-        self.pose_sub = rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, self.callback_pose)
         self.min_distance = 0.0
         self.action = 0.0
         self.vel = Twist()
-        self.path_pose = PoseArray()
         self.cv_image = np.zeros((480,640,3), np.uint8)
         self.cv_left_image = np.zeros((480,640,3), np.uint8)
         self.cv_right_image = np.zeros((480,640,3), np.uint8)
@@ -58,11 +56,12 @@ class cource_following_learning_node:
         self.save_img_no = 0
         self.save_img_no1= 0
         self.save_img_no2 = 0
-        self.goal_img_no1 = 0
+        self.goal_no = 0
+        self.count_no = 0
         self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/analysis/'
         self.pos_list = []
-        self.goal_list1 = []
-        self.goal_list2 = []
+        self.goal_list = []
+        self.cur_pos = []
         self.pos = PoseWithCovarianceStamped()
         self.g_pos = PoseStamped()
         self.orientation = 0
@@ -72,20 +71,23 @@ class cource_following_learning_node:
         self.state = ModelState()
         self.state.model_name = 'mobile_base'
         self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
-        self.count = 0
-        self.offset_ang = 1
-        # self.simple_goal_sub = rospy.Subscriber("move_base_simple/goal", PoseStamped, self.callback_simple_goal)
         self.simple_goal_pub = rospy.Publisher('move_base_simple/goal', PoseStamped, queue_size=10)
         os.makedirs(self.path + self.start_time)
         os.makedirs(self.path + "analysis/img/" + self.start_time)
         os.makedirs(self.path + "analysis/ang/" + self.start_time)
+        self.dl = deep_learning(n_action=1)
+
+        with open(self.csv_path + 'traceable_pos_fix.csv', 'r') as fs:
+            for row in fs:
+                self.pos_list.append(row)
+            # self.cur_pos = self.pos_list[self.save_img_no]
 
     def capture_img(self):
             Flag = True
             try:
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/center" + str(self.save_img_no) + ".jpg", self.cv_image)
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/right" + str(self.save_img_no) + ".jpg", self.cv_right_image)
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/left" + str(self.save_img_no) + ".jpg", self.cv_left_image)
+                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.cv_image)
+                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.cv_right_image)
+                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.cv_left_image)
             except:
                 print('Not save image')
                 Flag = False
@@ -98,15 +100,16 @@ class cource_following_learning_node:
             with open(self.path + "analysis/ang/" + self.start_time + '/ang.csv', 'a') as f:
                 writer = csv.writer(f, lineterminator='\n')
                 writer.writerow(line)
-
+    
     def read_csv(self):
-            if self.init:
-                f = open(self.csv_path + 'traceable_pos.csv', 'r')
-                for row in f:
-                    self.pos_list.append(row)
-                self.init = False
-            cur_pos = self.pos_list[self.save_img_no]
-            pos = cur_pos.split(',')
+            # if self.init:
+            #     f = open(self.csv_path + 'traceable_pos.csv', 'r')
+            #     for row in f:
+            #         self.pos_list.append(row)
+            #     self.init = False
+            # cur_pos = self.pos_list[self.save_img_no]
+            self.cur_pos = self.pos_list[self.save_img_no]
+            pos = self.cur_pos.split(',')
             x = float(pos[1])
             y = float(pos[2])
             theta = float(pos[3])
@@ -114,11 +117,14 @@ class cource_following_learning_node:
             return x, y, theta
 
     def simple_goal(self):
-            fs = open(self.csv_path + 'simple_goal.csv', 'r')
-            for row in fs:
-                self.goal_list2.append(row)
-            goal_pos2 = self.goal_list2[self.save_img_no1]
-            simple_pos = goal_pos2.split(',')
+            # fs = open(self.csv_path + 'traceable_pos_fix.csv', 'r')
+            # for row in fs:
+            #     self.goal_list2.append(row)
+
+            # goal_pos2 = self.goal_list[self.save_img_no1]
+            # simple_pos = goal_pos2.split(',')
+            self.cur_pos = self.pos_list[self.save_img_no + 14]
+            simple_pos = self.cur_pos.split(',')
             x = float(simple_pos[1])
             y = float(simple_pos[2])
 
@@ -158,8 +164,8 @@ class cource_following_learning_node:
 
             # self.amcl_pose_pub.publish(self.pos)
             #gazebo
-            for self.offset_ang in [-5, 0, 5]:
-                the = angle + math.radians(self.offset_ang)
+            for offset_ang in [-5, 0, 5]:
+                the = angle + math.radians(offset_ang)
                 the = the - 2.0 * math.pi if the >  math.pi else the
                 the = the + 2.0 * math.pi if the < -math.pi else the
                 self.state.pose.position.x = x
@@ -170,39 +176,49 @@ class cource_following_learning_node:
                 self.state.pose.orientation.z = quaternion[2]
                 self.state.pose.orientation.w = quaternion[3]
 
+                if offset_ang == -5:
+                    self.ang_no = "right"
+
+                if offset_ang == 0:
+                    self.ang_no = "center"
+
+                if offset_ang == +5:
+                    self.ang_no = "left"
+
                 try:
                     set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
                     resp = set_state( self.state )
-                    self.goal_img_no1 += 1
-                    print("goal_img_no:", self.goal_img_no1)
-
-                    if self.offset_ang == 0 and self.goal_img_no1 == 11:
-                        self.save_img_no1 += 1
-                        self.simple_goal()
-
-                    if self.offset_ang == 0 and self.goal_img_no1 == 137:
-                        self.save_img_no1 += 1
-                        self.simple_goal()
-
-                    if self.offset_ang == 0 and self.goal_img_no1 == 291:
-                        self.simple_goal()
-
-                    if self.offset_ang == 0 and self.goal_img_no1 == 403:
-                        self.simple_goal()
-
-                    if self.offset_ang == 0 and self.goal_img_no1 == 578:
-                        self.simple_goal()
-
-                    if self.offset_ang == 0 and self.goal_img_no1 == 711:
-                        self.simple_goal()
-
-                    if self.offset_ang == 0 and self.goal_img_no1 == 886:
-                        self.simple_goal()
                     
-                    if self.offset_ang == -5:
+                    # img = resize(self.cv_image, (48, 64), mode='constant')
+                    # r, g, b = cv2.split(img)
+                    # imgobj = np.asanyarray([r, g, b])
+
+                    # img_left = resize(self.cv_left_image, (48, 64), mode='constant')
+                    # r, g, b = cv2.split(img_left)
+                    # imgobj_left = np.asanyarray([r, g, b])
+
+                    # img_right = resize(self.cv_right_image, (48, 64), mode='constant')
+                    # r, g, b = cv2.split(img_right)
+                    # imgobj_right = np.asanyarray([r, g, b])
+                    
+                    # self.dl.make_dataset(imgobj, self.action)
+                    # self.dl.make_dataset(imgobj_left, self.action - 0.2)
+                    # self.dl.make_dataset(imgobj_right, self.action + 0.2)
+
+                    # if self.goal_no == 11:
+                    #     self.save_img_no1 += 1
+                    #     os.system('rosservice call /move_base/clear_costmaps')
+                    #     self.simple_goal()
+                    #     self.goal_no = -10
+
+                    if offset_ang == 0 and self.save_img_no % 7 == 0:
+                        self.simple_goal()
+                        os.system('rosservice call /move_base/clear_costmaps')
+                    
+                    if offset_ang == -5:
                         self.amcl_pose_pub.publish(self.pos)
-                        if self.save_img_no % 7 == 0:
-                            self.amcl_pose_pub.publish(self.pos)
+                        # if self.save_img_no % 7 == 0:
+                        #     self.amcl_pose_pub.publish(self.pos)
 
                     #test
                     self.capture_img()
@@ -224,19 +240,26 @@ class cource_following_learning_node:
         self.simple_goal()
     
     def collect_data(self, data):
-        self.goal_pub()
         rospy.wait_for_service('/collect_data')
         service = rospy.ServiceProxy('/collect_data', Trigger)
+        self.goal_pub()
 
-        for i in range(903):
+        for i in range(900):
             x, y, theta = self.read_csv()
             self.robot_moving(x, y, theta)
-            print("current_position:", x, y, theta)
+            self.count_no += 1
+            # print("current_position:", x, y, theta)
 
             self.save_img_no += 1
             # if self.save_img_no == 7:
             #     self.save_img_no = 0
             self.capture_rate.sleep()
+            if i == 885:
+                # for j in range(4000):
+                #     self.dl.trains()
+                # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")
+                os.system('killall roslaunch')
+                sys.exit()
 
     def callback(self, data):
         try:
@@ -259,18 +282,7 @@ class cource_following_learning_node:
     def callback_vel(self, data):
         self.vel = data
         self.action = self.vel.angular.z
-
-    def callback_pose(self, data):
-        distance_list = []
-        pos1 = data.pose.pose.position
-
-        for pose in self.path_pose.poses:
-            path = pose.pose.position
-            distance = np.sqrt(abs((pos1.x - path.x)**2 + (pos1.y - path.y)**2))
-            distance_list.append(distance)
-
-        if distance_list:
-            self.min_distance = min(distance_list)
+        
 
 if __name__ == '__main__':
     rg = cource_following_learning_node()
