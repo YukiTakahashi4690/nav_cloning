@@ -57,7 +57,6 @@ class cource_following_learning_node:
         self.save_img_no1= 0
         self.save_img_no2 = 0
         self.goal_no = 0
-        self.count_no = 0
         self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/analysis/'
         self.pos_list = []
         self.goal_list = []
@@ -66,7 +65,8 @@ class cource_following_learning_node:
         self.g_pos = PoseStamped()
         self.orientation = 0
         self.r = rospy.Rate(10)
-        self.capture_rate = rospy.Rate(0.5)
+        # self.capture_rate = rospy.Rate(0.5)
+        self.capture_rate = rospy.Rate(0.25)
         rospy.wait_for_service('/gazebo/set_model_state')
         self.state = ModelState()
         self.state.model_name = 'mobile_base'
@@ -76,18 +76,18 @@ class cource_following_learning_node:
         os.makedirs(self.path + "analysis/img/" + self.start_time)
         os.makedirs(self.path + "analysis/ang/" + self.start_time)
         self.dl = deep_learning(n_action=1)
+        
 
         with open(self.csv_path + 'traceable_pos_fix.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
-            # self.cur_pos = self.pos_list[self.save_img_no]
 
     def capture_img(self):
             Flag = True
             try:
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.cv_image)
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.cv_right_image)
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.cv_left_image)
+                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_resized)
+                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_right_resized)
+                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_left_resized)
             except:
                 print('Not save image')
                 Flag = False
@@ -164,7 +164,7 @@ class cource_following_learning_node:
 
             # self.amcl_pose_pub.publish(self.pos)
             #gazebo
-            for offset_ang in [-5, 0, 5]:
+            for offset_ang in [-7, -5, -3, 0, 3, 5, 7]:
                 the = angle + math.radians(offset_ang)
                 the = the - 2.0 * math.pi if the >  math.pi else the
                 the = the + 2.0 * math.pi if the < -math.pi else the
@@ -176,28 +176,47 @@ class cource_following_learning_node:
                 self.state.pose.orientation.z = quaternion[2]
                 self.state.pose.orientation.w = quaternion[3]
 
+                if offset_ang == -7:
+                    self.ang_no = "-7"
+                
                 if offset_ang == -5:
-                    self.ang_no = "right"
+                    self.ang_no = "-5"
+
+                if offset_ang == -3:
+                    self.ang_no = "-3"
 
                 if offset_ang == 0:
-                    self.ang_no = "center"
+                    self.ang_no = "0"
+
+                if offset_ang == +3:
+                    self.ang_no = "+3"
 
                 if offset_ang == +5:
-                    self.ang_no = "left"
+                    self.ang_no = "+5"
+
+                if offset_ang == +7:
+                    self.ang_no = "+7"
 
                 try:
                     set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
                     resp = set_state( self.state )
+
+                    # self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+                    self.im_resized = cv2.resize(self.cv_image, dsize=(64, 48))
+                    # self.cv_right_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+                    self.im_right_resized = cv2.resize(self.cv_right_image, dsize=(64, 48))
+                    # self.cv_left_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+                    self.im_left_resized = cv2.resize(self.cv_left_image, dsize=(64, 48))
                     
-                    # img = resize(self.cv_image, (48, 64), mode='constant')
+                    # self.img = resize(self.cv_image, (48, 64), mode='constant')
                     # r, g, b = cv2.split(img)
                     # imgobj = np.asanyarray([r, g, b])
 
-                    # img_left = resize(self.cv_left_image, (48, 64), mode='constant')
+                    # self.img_left = resize(self.cv_left_image, (48, 64), mode='constant')
                     # r, g, b = cv2.split(img_left)
                     # imgobj_left = np.asanyarray([r, g, b])
 
-                    # img_right = resize(self.cv_right_image, (48, 64), mode='constant')
+                    # self.img_right = resize(self.cv_right_image, (48, 64), mode='constant')
                     # r, g, b = cv2.split(img_right)
                     # imgobj_right = np.asanyarray([r, g, b])
                     
@@ -215,7 +234,7 @@ class cource_following_learning_node:
                         self.simple_goal()
                         os.system('rosservice call /move_base/clear_costmaps')
                     
-                    if offset_ang == -5:
+                    if offset_ang == -7:
                         self.amcl_pose_pub.publish(self.pos)
                         # if self.save_img_no % 7 == 0:
                         #     self.amcl_pose_pub.publish(self.pos)
@@ -247,13 +266,11 @@ class cource_following_learning_node:
         for i in range(900):
             x, y, theta = self.read_csv()
             self.robot_moving(x, y, theta)
-            self.count_no += 1
             # print("current_position:", x, y, theta)
 
             self.save_img_no += 1
-            # if self.save_img_no == 7:
-            #     self.save_img_no = 0
             self.capture_rate.sleep()
+
             if i == 885:
                 # for j in range(4000):
                 #     self.dl.trains()

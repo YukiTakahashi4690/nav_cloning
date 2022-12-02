@@ -56,7 +56,7 @@ class cource_following_learning_node:
         self.previous_reset_time = 0
         self.start_time_s = rospy.get_time()
         os.makedirs(self.path + self.start_time)
-        self.load_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/20221129_21:26:54/model_gpu.pt")
+        self.load_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/offset7_40000/model_gpu.pt")
 
         with open(self.path + self.start_time + '/' +  'reward.csv', 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
@@ -170,7 +170,7 @@ class cource_following_learning_node:
 
 if __name__ == '__main__':
     rg = cource_following_learning_node()
-    DURATION = 0.2
+    DURATION = 0.5
     r = rospy.Rate(1 / DURATION)
     while not rospy.is_shutdown():
         rg.loop()
