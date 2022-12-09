@@ -54,10 +54,8 @@ class cource_following_learning_node:
         self.collect_data_srv = rospy.Service('/collect_data', Trigger, self.collect_data)
         self.goal_pub_srv = rospy.Service('/goal_pub', Trigger, self.goal_pub)
         self.save_img_no = 0
-        self.save_img_no1= 0
-        self.save_img_no2 = 0
-        self.goal_no = 0
-        self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/analysis/'
+        self.clear_no = 0       
+        self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/path/'
         self.pos_list = []
         self.goal_list = []
         self.cur_pos = []
@@ -67,18 +65,19 @@ class cource_following_learning_node:
         self.r = rospy.Rate(10)
         # self.capture_rate = rospy.Rate(0.5)
         self.capture_rate = rospy.Rate(0.25)
+        # self.capture_rate = rospy.Rate(0.5)
         rospy.wait_for_service('/gazebo/set_model_state')
         self.state = ModelState()
         self.state.model_name = 'mobile_base'
         self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
         self.simple_goal_pub = rospy.Publisher('move_base_simple/goal', PoseStamped, queue_size=10)
-        os.makedirs(self.path + self.start_time)
         os.makedirs(self.path + "analysis/img/" + self.start_time)
         os.makedirs(self.path + "analysis/ang/" + self.start_time)
         self.dl = deep_learning(n_action=1)
         
 
         with open(self.csv_path + 'traceable_pos_fix.csv', 'r') as fs:
+        # with open(self.csv_path + 'capture_pos_dist025dy005.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
 
@@ -102,12 +101,6 @@ class cource_following_learning_node:
                 writer.writerow(line)
     
     def read_csv(self):
-            # if self.init:
-            #     f = open(self.csv_path + 'traceable_pos.csv', 'r')
-            #     for row in f:
-            #         self.pos_list.append(row)
-            #     self.init = False
-            # cur_pos = self.pos_list[self.save_img_no]
             self.cur_pos = self.pos_list[self.save_img_no]
             pos = self.cur_pos.split(',')
             x = float(pos[1])
@@ -117,13 +110,9 @@ class cource_following_learning_node:
             return x, y, theta
 
     def simple_goal(self):
-            # fs = open(self.csv_path + 'traceable_pos_fix.csv', 'r')
-            # for row in fs:
-            #     self.goal_list2.append(row)
-
-            # goal_pos2 = self.goal_list[self.save_img_no1]
-            # simple_pos = goal_pos2.split(',')
             self.cur_pos = self.pos_list[self.save_img_no + 14]
+            # self.cur_pos = self.pos_list[self.save_img_no + 21]
+            # self.cur_pos = self.pos_list[self.save_img_no + 52]
             simple_pos = self.cur_pos.split(',')
             x = float(simple_pos[1])
             y = float(simple_pos[2])
@@ -224,15 +213,15 @@ class cource_following_learning_node:
                     # self.dl.make_dataset(imgobj_left, self.action - 0.2)
                     # self.dl.make_dataset(imgobj_right, self.action + 0.2)
 
-                    # if self.goal_no == 11:
-                    #     self.save_img_no1 += 1
-                    #     os.system('rosservice call /move_base/clear_costmaps')
-                    #     self.simple_goal()
-                    #     self.goal_no = -10
-
+                    ## dist 0.5 dy 0.1 ##
                     if offset_ang == 0 and self.save_img_no % 7 == 0:
+                    ## dy 0.05 ##
+                    # if offset_ang == 0 and self.save_img_no % 13 == 0:
+                        # os.system('rosservice call /move_base/clear_costmaps')
                         self.simple_goal()
-                        os.system('rosservice call /move_base/clear_costmaps')
+                    # elif self.clear_no == 4 and offset_ang == 7:
+                    #     os.system('rosservice call /move_base/clear_costmaps')
+                    #     self.clear_no = -3
                     
                     if offset_ang == -7:
                         self.amcl_pose_pub.publish(self.pos)
@@ -263,15 +252,22 @@ class cource_following_learning_node:
         service = rospy.ServiceProxy('/collect_data', Trigger)
         self.goal_pub()
 
-        for i in range(900):
+        for i in range(len(self.pos_list)):
             x, y, theta = self.read_csv()
             self.robot_moving(x, y, theta)
             # print("current_position:", x, y, theta)
 
             self.save_img_no += 1
+            # self.clear_no += 1
+            # print("clear_no", self.clear_no)
             self.capture_rate.sleep()
 
-            if i == 885:
+            ##dist 0.1 dy 0.1 ##
+            if i == len(self.pos_list) - 11:
+            ## dist 0.25 ##
+            # if i == len(self.pos_list) - 18:
+            ##dist 0.25 dy 0.05 ##
+            # if i == len(self.pos_list) - 59:
                 # for j in range(4000):
                 #     self.dl.trains()
                 # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")

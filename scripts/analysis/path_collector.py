@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Scripts to collect the route that the robot travels
 
@@ -17,7 +17,7 @@ class path_collector_node:
         self.path_no = 0
         self.vel_sub = rospy.Subscriber("/nav_vel", Twist, self.callback_vel)
         self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/analysis/'
+        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/path/'
         self.vel_angular = 0
         self.vel = Twist()
         os.makedirs(self.path)

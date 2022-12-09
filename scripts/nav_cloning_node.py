@@ -6,7 +6,7 @@ import rospy
 import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-from nav_cloning_pytorch import *
+from nav_cloning_net import *
 from skimage.transform import resize
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PoseArray
@@ -15,20 +15,20 @@ from std_srvs.srv import Trigger
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from std_srvs.srv import Empty
-#from gazebo_msgs.srv import SetModelState
-#from gazebo_msgs.srv import GetModelState
-#from gazebo_msgs.msg import ModelState
 from std_srvs.srv import SetBool, SetBoolResponse
 import csv
 import os
 import time
 import copy
+import sys
+import tf
+from nav_msgs.msg import Odometry
 
-class cource_following_learning_node:
+class nav_cloning_node:
     def __init__(self):
-        rospy.init_node('cource_following_learning_node', anonymous=True)
-        self.action_num = rospy.get_param("/LiDAR_based_learning_node/action_num", 1)
-        print("action_num: " + str(self.action_num))
+        rospy.init_node('nav_cloning_node', anonymous=True)
+        self.mode = rospy.get_param("/nav_cloning_node/mode", "use_dl_output")
+        self.action_num = 1
         self.dl = deep_learning(n_action = self.action_num)
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.callback)
@@ -51,16 +51,20 @@ class cource_following_learning_node:
         self.learning = True
         self.select_dl = False
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
-        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/'
-        self.save_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/model/'
+        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result_'+str(self.mode)+'/'
+        self.save_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/model_'+str(self.mode)+'/'
         self.previous_reset_time = 0
+        self.pos_x = 0.0
+        self.pos_y = 0.0
+        self.pos_the = 0.0
+        self.is_started = False
         self.start_time_s = rospy.get_time()
         os.makedirs(self.path + self.start_time)
-        self.load_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/offset7_40000/model_gpu.pt")
 
-        with open(self.path + self.start_time + '/' +  'reward.csv', 'w') as f:
+        with open(self.path + self.start_time + '/' +  'training.csv', 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
-            writer.writerow(['step', 'mode', 'loss', 'angle_error(rad)', 'distance(m)'])
+            writer.writerow(['step', 'mode', 'loss', 'angle_error(rad)', 'distance(m)','x(m)','y(m)', 'the(rad)'])
+        self.tracker_sub = rospy.Subscriber("/tracker", Odometry, self.callback_tracker)
 
     def callback(self, data):
         try:
@@ -80,13 +84,19 @@ class cource_following_learning_node:
         except CvBridgeError as e:
             print(e)
 
+    def callback_tracker(self, data):
+        self.pos_x = data.pose.pose.position.x
+        self.pos_y = data.pose.pose.position.y
+        rot = data.pose.pose.orientation
+        angle = tf.transformations.euler_from_quaternion((rot.x, rot.y, rot.z, rot.w))
+        self.pos_the = angle[2]
+
     def callback_path(self, data):
         self.path_pose = data
 
     def callback_pose(self, data):
         distance_list = []
         pos = data.pose.pose.position
-
         for pose in self.path_pose.poses:
             path = pose.pose.position
             distance = np.sqrt(abs((pos.x - path.x)**2 + (pos.y - path.y)**2))
@@ -113,18 +123,10 @@ class cource_following_learning_node:
             return
         if self.cv_right_image.size != 640 * 480 * 3:
             return
-        """
-        rospy.wait_for_service('/gazebo/get_model_state')
-        get_model_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-        try:
-            previous_model_state = get_model_state('mobile_base', 'world')
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
-        """
-        
-        # if self.vel.linear.x == 0:
-        #     return
-
+        if self.vel.linear.x != 0:
+            self.is_started = True
+        if self.is_started == False:
+            return
         img = resize(self.cv_image, (48, 64), mode='constant')
         r, g, b = cv2.split(img)
         imgobj = np.asanyarray([r,g,b])
@@ -139,26 +141,107 @@ class cource_following_learning_node:
 
         ros_time = str(rospy.Time.now())
 
-
-        if self.episode == 0:
+        if self.episode == 4000:
             self.learning = False
-            #self.dl.save(self.save_path)
-            self.dl.load(self.load_path)
+            self.dl.save(self.save_path)
+            #self.dl.load(self.load_path)
 
-        
-        target_action = self.dl.act(img)
-        distance = self.min_distance
-        print("TEST MODE: " + " angular:" + str(target_action) + ", distance: " + str(distance))
+        if self.episode == 6000:
+            os.system('killall roslaunch')
+            sys.exit()
 
-        self.episode += 1
-        angle_error = abs(self.action - target_action)
-        line = [str(self.episode), "test", "0", str(angle_error), str(distance)]
-        with open(self.path + self.start_time + '/' + 'reward.csv', 'a') as f:
-            writer = csv.writer(f, lineterminator='\n')
-            writer.writerow(line)
-        self.vel.linear.x = 0.2
-        self.vel.angular.z = target_action
-        self.nav_pub.publish(self.vel)
+        if self.learning:
+            target_action = self.action
+            distance = self.min_distance
+
+            if self.mode == "manual":
+                if distance > 0.1:
+                    self.select_dl = False
+                elif distance < 0.05:
+                    self.select_dl = True
+                if self.select_dl and self.episode >= 0:
+                    target_action = 0
+                action, loss = self.dl.act_and_trains(imgobj, target_action)
+                if abs(target_action) < 0.1:
+                    action_left,  loss_left  = self.dl.act_and_trains(imgobj_left, target_action - 0.2)
+                    action_right, loss_right = self.dl.act_and_trains(imgobj_right, target_action + 0.2)
+                angle_error = abs(action - target_action)
+
+            elif self.mode == "zigzag":
+                action, loss = self.dl.act_and_trains(imgobj, target_action)
+                if abs(target_action) < 0.1:
+                    action_left,  loss_left  = self.dl.act_and_trains(imgobj_left, target_action - 0.2)
+                    action_right, loss_right = self.dl.act_and_trains(imgobj_right, target_action + 0.2)
+                angle_error = abs(action - target_action)
+                if distance > 0.1:
+                    self.select_dl = False
+                elif distance < 0.05:
+                    self.select_dl = True
+                if self.select_dl and self.episode >= 0:
+                    target_action = 0
+
+            elif self.mode == "use_dl_output":
+                action, loss = self.dl.act_and_trains(imgobj, target_action)
+                if abs(target_action) < 0.1:
+                    action_left,  loss_left  = self.dl.act_and_trains(imgobj_left, target_action - 0.2)
+                    action_right, loss_right = self.dl.act_and_trains(imgobj_right, target_action + 0.2)
+                angle_error = abs(action - target_action)
+                if distance > 0.1:
+                    self.select_dl = False
+                elif distance < 0.05:
+                    self.select_dl = True
+                if self.select_dl and self.episode >= 0:
+                    target_action = action
+
+            elif self.mode == "follow_line":
+                action, loss = self.dl.act_and_trains(imgobj, target_action)
+                if abs(target_action) < 0.1:
+                    action_left,  loss_left  = self.dl.act_and_trains(imgobj_left, target_action - 0.2)
+                    action_right, loss_right = self.dl.act_and_trains(imgobj_right, target_action + 0.2)
+                angle_error = abs(action - target_action)
+
+            elif self.mode == "selected_training":
+                action = self.dl.act(imgobj)
+                angle_error = abs(action - target_action)
+                loss = 0
+                if angle_error > 0.05:
+                    action, loss = self.dl.act_and_trains(imgobj, target_action)
+                    if abs(target_action) < 0.1:
+                        action_left,  loss_left  = self.dl.act_and_trains(imgobj_left, target_action - 0.2)
+                        action_right, loss_right = self.dl.act_and_trains(imgobj_right, target_action + 0.2)
+                if distance > 0.1:
+                    self.select_dl = False
+                elif distance < 0.05:
+                    self.select_dl = True
+                if self.select_dl and self.episode >= 0:
+                    target_action = action
+
+            # end mode
+
+            print(str(self.episode) + ", training, loss: " + str(loss) + ", angle_error: " + str(angle_error) + ", distance: " + str(distance))
+            self.episode += 1
+            line = [str(self.episode), "training", str(loss), str(angle_error), str(distance), str(self.pos_x), str(self.pos_y), str(self.pos_the)]
+            with open(self.path + self.start_time + '/' + 'training.csv', 'a') as f:
+                writer = csv.writer(f, lineterminator='\n')
+                writer.writerow(line)
+            self.vel.linear.x = 0.2
+            self.vel.angular.z = target_action
+            self.nav_pub.publish(self.vel)
+
+        else:
+            target_action = self.dl.act(imgobj)
+            distance = self.min_distance
+            print(str(self.episode) + ", test, angular:" + str(target_action) + ", distance: " + str(distance))
+
+            self.episode += 1
+            angle_error = abs(self.action - target_action)
+            line = [str(self.episode), "test", "0", str(angle_error), str(distance), str(self.pos_x), str(self.pos_y), str(self.pos_the)]
+            with open(self.path + self.start_time + '/' + 'training.csv', 'a') as f:
+                writer = csv.writer(f, lineterminator='\n')
+                writer.writerow(line)
+            self.vel.linear.x = 0.2
+            self.vel.angular.z = target_action
+            self.nav_pub.publish(self.vel)
 
         temp = copy.deepcopy(img)
         cv2.imshow("Resized Image", temp)
@@ -169,8 +252,8 @@ class cource_following_learning_node:
         cv2.waitKey(1)
 
 if __name__ == '__main__':
-    rg = cource_following_learning_node()
-    DURATION = 0.5
+    rg = nav_cloning_node()
+    DURATION = 0.2
     r = rospy.Rate(1 / DURATION)
     while not rospy.is_shutdown():
         rg.loop()

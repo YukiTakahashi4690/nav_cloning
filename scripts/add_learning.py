@@ -12,11 +12,11 @@ class cource_following_learning_node:
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time)
         self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")
-        self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/ang/offset7/")
-        self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/offset7/right")
-        self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/offset7/center")
-        self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/offset7/left")
-        self.learn_no = 40000
+        self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/ang/dist025/")
+        self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/dist025/right")
+        self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/dist025/center")
+        self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/dist025/left")
+        self.learn_no = 10000
         
         # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")
 
@@ -26,7 +26,9 @@ class cource_following_learning_node:
         img_list = []
         img_left_list = []
         for i in range(886):
+        # for i in range(1687):
             for j in ["-7", "-5", "-3", "0", "+3", "+5", "+7"]:
+            # for j in ["center", "right", "left"]:
                 img_right = cv2.imread(self.img_right_path + str(i) + "_" + j + ".jpg")
                 img = cv2.imread(self.img_path + str(i) + "_" + j + ".jpg")
                 img_left = cv2.imread(self.img_left_path + str(i) + "_" + j + ".jpg")
@@ -39,7 +41,8 @@ class cource_following_learning_node:
                 no, tar_ang = row
                 ang_list.append(float(tar_ang))
 
-        for k in range(886 * 7):
+        # for k in range(1687 * 7):
+        for k in range(886 * 3):
             img_right = img_right_list[k]
             img = img_list[k]
             img_left = img_left_list[k]
