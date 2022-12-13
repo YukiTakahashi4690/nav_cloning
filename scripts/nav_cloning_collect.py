@@ -63,9 +63,9 @@ class cource_following_learning_node:
         self.g_pos = PoseStamped()
         self.orientation = 0
         self.r = rospy.Rate(10)
-        # self.capture_rate = rospy.Rate(0.5)
-        self.capture_rate = rospy.Rate(0.25)
-        # self.capture_rate = rospy.Rate(0.5)
+        self.capture_rate = rospy.Rate(0.5)
+        # self.capture_rate = rospy.Rate(0.25)
+        # self.capture_rate = rospy.Rate(0.15)
         rospy.wait_for_service('/gazebo/set_model_state')
         self.state = ModelState()
         self.state.model_name = 'mobile_base'
@@ -76,8 +76,8 @@ class cource_following_learning_node:
         self.dl = deep_learning(n_action=1)
         
 
-        with open(self.csv_path + 'traceable_pos_fix.csv', 'r') as fs:
-        # with open(self.csv_path + 'capture_pos_dist025dy005.csv', 'r') as fs:
+        # with open(self.csv_path + 'traceable_pos_fix.csv', 'r') as fs:
+        with open(self.csv_path + 'capture_pos_test.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
 
@@ -110,7 +110,8 @@ class cource_following_learning_node:
             return x, y, theta
 
     def simple_goal(self):
-            self.cur_pos = self.pos_list[self.save_img_no + 14]
+            self.cur_pos = self.pos_list[self.save_img_no + 57]
+            # self.cur_pos = self.pos_list[self.save_img_no + 14]
             # self.cur_pos = self.pos_list[self.save_img_no + 21]
             # self.cur_pos = self.pos_list[self.save_img_no + 52]
             simple_pos = self.cur_pos.split(',')
@@ -153,7 +154,8 @@ class cource_following_learning_node:
 
             # self.amcl_pose_pub.publish(self.pos)
             #gazebo
-            for offset_ang in [-7, -5, -3, 0, 3, 5, 7]:
+            # for offset_ang in [-7, -5, -3, 0, 3, 5, 7]:
+            for offset_ang in [-5, 0, 5]:
                 the = angle + math.radians(offset_ang)
                 the = the - 2.0 * math.pi if the >  math.pi else the
                 the = the + 2.0 * math.pi if the < -math.pi else the
@@ -165,26 +167,26 @@ class cource_following_learning_node:
                 self.state.pose.orientation.z = quaternion[2]
                 self.state.pose.orientation.w = quaternion[3]
 
-                if offset_ang == -7:
-                    self.ang_no = "-7"
+                # if offset_ang == -7:
+                #     self.ang_no = "-7"
                 
                 if offset_ang == -5:
                     self.ang_no = "-5"
 
-                if offset_ang == -3:
-                    self.ang_no = "-3"
+                # if offset_ang == -3:
+                #     self.ang_no = "-3"
 
                 if offset_ang == 0:
                     self.ang_no = "0"
 
-                if offset_ang == +3:
-                    self.ang_no = "+3"
+                # if offset_ang == +3:
+                #     self.ang_no = "+3"
 
                 if offset_ang == +5:
                     self.ang_no = "+5"
 
-                if offset_ang == +7:
-                    self.ang_no = "+7"
+                # if offset_ang == +7:
+                #     self.ang_no = "+7"
 
                 try:
                     set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
@@ -214,19 +216,21 @@ class cource_following_learning_node:
                     # self.dl.make_dataset(imgobj_right, self.action + 0.2)
 
                     ## dist 0.5 dy 0.1 ##
-                    if offset_ang == 0 and self.save_img_no % 7 == 0:
+                    # if offset_ang == 0 and self.save_img_no % 7 == 0:
                     ## dy 0.05 ##
                     # if offset_ang == 0 and self.save_img_no % 13 == 0:
+                    if offset_ang == 0 and self.save_img_no % 19 == 0:
                         # os.system('rosservice call /move_base/clear_costmaps')
                         self.simple_goal()
                     # elif self.clear_no == 4 and offset_ang == 7:
                     #     os.system('rosservice call /move_base/clear_costmaps')
                     #     self.clear_no = -3
                     
-                    if offset_ang == -7:
+                    # if offset_ang == -7:
+                    if offset_ang == -5:
                         self.amcl_pose_pub.publish(self.pos)
-                        # if self.save_img_no % 7 == 0:
-                        #     self.amcl_pose_pub.publish(self.pos)
+                        if self.save_img_no % 19 == 0:
+                            self.amcl_pose_pub.publish(self.pos)
 
                     #test
                     self.capture_img()
@@ -236,6 +240,9 @@ class cource_following_learning_node:
                 self.r.sleep()
                 self.r.sleep()
                 self.r.sleep()
+                # self.r.sleep()
+                # self.r.sleep()
+                # self.r.sleep()
             
             self.r.sleep()
             self.r.sleep()
@@ -263,11 +270,12 @@ class cource_following_learning_node:
             self.capture_rate.sleep()
 
             ##dist 0.1 dy 0.1 ##
-            if i == len(self.pos_list) - 11:
+            # if i == len(self.pos_list) - 11:
             ## dist 0.25 ##
             # if i == len(self.pos_list) - 18:
             ##dist 0.25 dy 0.05 ##
             # if i == len(self.pos_list) - 59:
+            if i == len(self.pos_list) - 67:
                 # for j in range(4000):
                 #     self.dl.trains()
                 # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")

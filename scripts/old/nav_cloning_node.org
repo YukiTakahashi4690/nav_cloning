@@ -294,7 +294,7 @@ class cource_following_learning_node:
                 writer.writerow(line)
             self.vel.linear.x = 0.2
             self.vel.angular.z = target_action
-            self.nav_pub.publish(self.vel)lf.action
+            self.nav_pub.publish(self.vel)
         temp = copy.deepcopy(img_left)
         cv2.imshow("Resized Left Image", temp)
         temp = copy.deepcopy(img_right)
