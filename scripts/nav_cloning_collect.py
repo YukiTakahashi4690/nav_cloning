@@ -128,7 +128,8 @@ class cource_following_learning_node:
             self.g_pos.pose.orientation.x = 0 
             self.g_pos.pose.orientation.y = 0
             self.g_pos.pose.orientation.z = 0
-            self.g_pos.pose.orientation.w = 0.999
+            # self.g_pos.pose.orientation.w = 0.999
+            self.g_pos.pose.orientation.w = 1.001
 
             self.simple_goal_pub.publish(self.g_pos)
 

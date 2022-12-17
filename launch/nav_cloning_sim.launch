@@ -25,8 +25,13 @@
         name="timed_roslaunch2" >      
   </node>
 
+  <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
+        args="10 conv_for_piechart conv.launch"
+        name="timed_roslaunch3" >      
+  </node>
+
   <!-- <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
-        args="10 nav_cloning start_wp_nav.launch"
-        name="timed_roslaunch3" >
+        args="12 nav_cloning start_wp_nav.launch"
+        name="timed_roslaunch4" >
   </node> -->
 </launch>
