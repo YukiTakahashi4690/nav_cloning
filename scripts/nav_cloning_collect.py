@@ -110,7 +110,9 @@ class cource_following_learning_node:
             return x, y, theta
 
     def simple_goal(self):
-            self.cur_pos = self.pos_list[self.save_img_no + 57]
+        list_num = self.save_img_no + 57
+        if list_num <= len(self.pos_list):
+            self.cur_pos = self.pos_list[list_num]
             # self.cur_pos = self.pos_list[self.save_img_no + 14]
             # self.cur_pos = self.pos_list[self.save_img_no + 21]
             # self.cur_pos = self.pos_list[self.save_img_no + 52]
@@ -132,6 +134,8 @@ class cource_following_learning_node:
             self.g_pos.pose.orientation.w = 1.001
 
             self.simple_goal_pub.publish(self.g_pos)
+        else:
+            pass
 
     def robot_moving(self, x, y, angle):
             #amcl
@@ -276,7 +280,7 @@ class cource_following_learning_node:
             # if i == len(self.pos_list) - 18:
             ##dist 0.25 dy 0.05 ##
             # if i == len(self.pos_list) - 59:
-            if i == len(self.pos_list) - 67:
+            if i == len(self.pos_list):
                 # for j in range(4000):
                 #     self.dl.trains()
                 # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")

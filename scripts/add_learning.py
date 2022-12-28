@@ -12,11 +12,11 @@ class cource_following_learning_node:
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time)
         self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/model/")
-        self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/ang/gauss_add/")
-        self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/gauss_add/right")
-        self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/gauss_add/center")
-        self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/gauss_add/left")
-        self.learn_no = 4000
+        self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/ang/imp_gauss/")
+        self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/imp_gauss/right")
+        self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/imp_gauss/center")
+        self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/imp_gauss/left")
+        self.learn_no = 10000
         
         # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")
 
@@ -25,7 +25,8 @@ class cource_following_learning_node:
         img_right_list = []
         img_list = []
         img_left_list = []
-        for i in range(2566):
+        for i in range(2414):
+        # for i in range(2718):
         # for i in range(1687):
         # for i in range(886):
             for j in ["-5", "0", "+5"]:
@@ -45,7 +46,8 @@ class cource_following_learning_node:
 
         # for k in range(1687 * 7):
         # for k in range(886 * 3):
-        for k in range(2566 * 3):
+        # for k in range(2718 * 3):
+        for k in range(2414 * 3):
             img_right = img_right_list[k]
             img = img_list[k]
             img_left = img_left_list[k]
@@ -63,9 +65,25 @@ class cource_following_learning_node:
             r, g, b = cv2.split(img_left)
             imgobj_left = np.asanyarray([r, g, b])
             
-            # self.dl.make_dataset(imgobj_right, target_ang + 0.2)
-            # self.dl.make_dataset(imgobj, target_ang)
-            # self.dl.make_dataset(imgobj_left, target_ang - 0.2)
+            """
+            self.dl.make_dataset(imgobj_right, target_ang + 0.2)
+            self.dl.make_dataset(imgobj, target_ang)
+            self.dl.make_dataset(imgobj_left, target_ang - 0.2)
+            """
+
+            # if k == 884:
+            #     for n in range(4):
+            #         for k in range(884, 1340):
+            #             self.dl.make_dataset(img_right, target_ang + 0.2)
+            #             self.dl.make_dataset(img, target_ang)
+            #             self.dl.make_dataset(img_left, target_ang - 0.2)
+            #             print("dataset:" + str(k))
+            # elif k == 1036:
+            #     print("--------------------")
+            #     print("coner learning end!!")
+            #     print("--------------------")
+            #     pass
+            # else:            
             self.dl.make_dataset(img_right, target_ang + 0.2)
             self.dl.make_dataset(img, target_ang)
             self.dl.make_dataset(img_left, target_ang - 0.2)

@@ -56,7 +56,7 @@ class cource_following_learning_node:
         self.previous_reset_time = 0
         self.start_time_s = rospy.get_time()
         os.makedirs(self.path + self.start_time)
-        self.load_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/model/gauss_add_4000_5/model_gpu.pt")
+        self.load_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/model/batch_learn/batch_10000_10/model_gpu.pt")
 
         with open(self.path + self.start_time + '/' +  'reward.csv', 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
