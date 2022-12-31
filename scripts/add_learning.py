@@ -16,7 +16,7 @@ class cource_following_learning_node:
         self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/imp_gauss/right")
         self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/imp_gauss/center")
         self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/imp_gauss/left")
-        self.learn_no = 10000
+        self.learn_no = 8000
         
         # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")
 
@@ -26,7 +26,7 @@ class cource_following_learning_node:
         img_list = []
         img_left_list = []
         for i in range(2414):
-        # for i in range(2718):
+        # for i in range(2832):
         # for i in range(1687):
         # for i in range(886):
             for j in ["-5", "0", "+5"]:
@@ -46,7 +46,7 @@ class cource_following_learning_node:
 
         # for k in range(1687 * 7):
         # for k in range(886 * 3):
-        # for k in range(2718 * 3):
+        # for k in range(2832 * 4):
         for k in range(2414 * 3):
             img_right = img_right_list[k]
             img = img_list[k]
@@ -71,23 +71,22 @@ class cource_following_learning_node:
             self.dl.make_dataset(imgobj_left, target_ang - 0.2)
             """
 
-            # if k == 884:
-            #     for n in range(4):
-            #         for k in range(884, 1340):
-            #             self.dl.make_dataset(img_right, target_ang + 0.2)
-            #             self.dl.make_dataset(img, target_ang)
-            #             self.dl.make_dataset(img_left, target_ang - 0.2)
-            #             print("dataset:" + str(k))
-            # elif k == 1036:
-            #     print("--------------------")
-            #     print("coner learning end!!")
-            #     print("--------------------")
-            #     pass
-            # else:            
-            self.dl.make_dataset(img_right, target_ang + 0.2)
-            self.dl.make_dataset(img, target_ang)
-            self.dl.make_dataset(img_left, target_ang - 0.2)
-            print("dataset:" + str(k))
+            if 1092 >= k >=  884 :
+                for n in range(3):
+                        self.dl.make_dataset(img_right, target_ang + 0.2)
+                        self.dl.make_dataset(img, target_ang)
+                        self.dl.make_dataset(img_left, target_ang - 0.2)
+                        print("dataset:" + str(k))
+            elif k == 1092:
+                print("--------------------")
+                print("coner learning end!!")
+                print("--------------------")
+                pass
+            else:            
+                self.dl.make_dataset(img_right, target_ang + 0.2)
+                self.dl.make_dataset(img, target_ang)
+                self.dl.make_dataset(img_left, target_ang - 0.2)
+                print("dataset:" + str(k))
 
         for l in range(self.learn_no):
             loss = self.dl.trains()
@@ -96,7 +95,7 @@ class cource_following_learning_node:
                 writer = csv.writer(fw, lineterminator='\n')
                 line = [str(loss)]
                 writer.writerow(line)
-
+        
         self.dl.save(self.save_path)
 
 if __name__ == '__main__':
