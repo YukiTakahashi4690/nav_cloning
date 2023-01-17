@@ -77,7 +77,7 @@ class cource_following_learning_node:
         
 
         # with open(self.csv_path + 'traceable_pos_fix.csv', 'r') as fs:
-        with open(self.csv_path + 'capture_pos_test.csv', 'r') as fs:
+        with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
 
@@ -110,7 +110,10 @@ class cource_following_learning_node:
             return x, y, theta
 
     def simple_goal(self):
+        #exp2.3
         list_num = self.save_img_no + 57
+        #exp1
+        # list_num = self.save_img_no + 21
         if list_num <= len(self.pos_list):
             self.cur_pos = self.pos_list[list_num]
             # self.cur_pos = self.pos_list[self.save_img_no + 14]
@@ -224,7 +227,10 @@ class cource_following_learning_node:
                     # if offset_ang == 0 and self.save_img_no % 7 == 0:
                     ## dy 0.05 ##
                     # if offset_ang == 0 and self.save_img_no % 13 == 0:
+                    #exp2.3
                     if offset_ang == 0 and self.save_img_no % 19 == 0:
+                    #exp1
+                    # if offset_ang == 0 and self.save_img_no % 7 == 0:
                         # os.system('rosservice call /move_base/clear_costmaps')
                         self.simple_goal()
                     # elif self.clear_no == 4 and offset_ang == 7:
@@ -235,6 +241,7 @@ class cource_following_learning_node:
                     if offset_ang == -5:
                         self.amcl_pose_pub.publish(self.pos)
                         if self.save_img_no % 19 == 0:
+                        # if self.save_img_no % 7 == 0:
                             self.amcl_pose_pub.publish(self.pos)
 
                     #test
