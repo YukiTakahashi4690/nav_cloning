@@ -12,11 +12,11 @@ class cource_following_learning_node:
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time)
         self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/model/")
-        self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/ang/fix/")
-        self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/fix/right")
-        self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/fix/center")
-        self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/fix/left")
-        self.learn_no = 3000
+        self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/ang/exp1/")
+        self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/exp1/right")
+        self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/exp1/center")
+        self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/exp1/left")
+        self.learn_no = 4000
         self.pos_no = 0
         
         # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")
