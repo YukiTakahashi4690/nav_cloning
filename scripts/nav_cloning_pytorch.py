@@ -22,7 +22,7 @@ from yaml import load
 # HYPER PARAM
 # BATCH_SIZE = 8
 # BATCH_SIZE = 916*3
-BATCH_SIZE = 2484*3
+BATCH_SIZE = 2485*3
 MAX_DATA = 10000
 
 class Net(nn.Module):

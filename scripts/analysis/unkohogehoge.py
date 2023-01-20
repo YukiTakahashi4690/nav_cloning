@@ -11,9 +11,9 @@ class target_path:
         rospy.init_node('target_path', anonymous=True)
         self.image = cv2.imread(roslib.packages.get_pkg_dir('nav_cloning')+'/maps/willowgarage.pgm')
         self.image_resize = cv2.resize(self.image, (600, 600))
-        self.file_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/path/path_fix.csv'
+        self.file_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/trajectory/exp1.2/8000_1.csv'
         self.save_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/draw_maps/"
-        self.image_name = "path_fix"
+        self.image_name = "exp1.2_8000_1"
         self.path_x = []
         self.path_y = []
         self.pos_x = 0
@@ -47,9 +47,9 @@ class target_path:
         self.vis_y = 325 + int(pos_y * 13.5) * (-1)
         self.old_vis_x = 205 + int(old_pos_x * 10.7)
         self.old_vis_y = 325 + int(old_pos_y * 13.5) * (-1)
-        cv2.circle(self.image_resize, (self.vis_x, self.vis_y), 2, (0, 0, 255), thickness = 2)
+        cv2.circle(self.image_resize, (self.vis_x, self.vis_y), 2, (0, 0, 255), thickness = 1)
         if count >= 1:
-            cv2.line(self.image_resize, (self.vis_x, self.vis_y), (self.old_vis_x, self.old_vis_y), (255, 0, 0), thickness=3)
+            cv2.line(self.image_resize, (self.vis_x, self.vis_y), (self.old_vis_x, self.old_vis_y), (0, 0, 255), thickness=3)
 
     def loop(self):
         self.pos_x = float(self.path_x[self.count]) - 11.252
@@ -72,7 +72,7 @@ class target_path:
 
 if __name__ == '__main__':
     rg = target_path()
-    r = rospy.Rate(50)
+    r = rospy.Rate(100)
     while not rospy.is_shutdown():
         rg.loop()
         r.sleep()

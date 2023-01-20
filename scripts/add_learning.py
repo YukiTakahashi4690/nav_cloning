@@ -12,10 +12,10 @@ class cource_following_learning_node:
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time)
         self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/model/")
-        self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/ang/exp1/")
-        self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/exp1/right")
-        self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/exp1/center")
-        self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/exp1/left")
+        self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/ang/fix/")
+        self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/fix/right")
+        self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/fix/center")
+        self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/fix/left")
         self.learn_no = 4000
         self.pos_no = 0
         
@@ -36,7 +36,7 @@ class cource_following_learning_node:
         #exp1
         # for i in range(916):
         #fix
-        for i in range(2484):
+        for i in range(2485):
             for j in ["-5", "0", "+5"]:
             # for j in ["-7", "-5", "-3", "0", "+3", "+5", "+7"]:
             # for j in ["center", "right", "left"]:
@@ -61,7 +61,7 @@ class cource_following_learning_node:
         #exp1
         # for k in range(916 * 3):
         #fix
-        for k in range(2484 * 3):
+        for k in range(2485 * 3):
             img_right = img_right_list[k]
             img = img_list[k]
             img_left = img_left_list[k]

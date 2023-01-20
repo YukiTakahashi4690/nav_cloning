@@ -23,6 +23,7 @@ import csv
 import os
 import time
 import copy
+from nav_msgs.msg import Odometry
 
 class cource_following_learning_node:
     def __init__(self):
@@ -56,11 +57,28 @@ class cource_following_learning_node:
         self.previous_reset_time = 0
         self.start_time_s = rospy.get_time()
         os.makedirs(self.path + self.start_time)
-        self.load_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/model/fix/1000_10/model_gpu.pt")
+        self.load_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/model/fix/exp1.2/8000_1/model_gpu.pt")
+
+        self.odom_sub = rospy.Subscriber("/tracker", Odometry, self.path_write)
+        self.path_pose_x = 0
+        self.path_pose_y = 0
+        self.path_no = 0
+
+        with open(self.path +  'analysis/trajectory/exp1.2/8000_1.csv', 'w') as f:
+            writer = csv.writer(f, lineterminator='\n')
 
         with open(self.path + self.start_time + '/' +  'reward.csv', 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
             writer.writerow(['step', 'mode', 'loss', 'angle_error(rad)', 'distance(m)'])
+
+    def path_write(self, data):
+            with open(self.path + 'analysis/trajectory/exp1.2/8000_1.csv', 'a') as f:
+                self.path_pose_x = data.pose.pose.position.x
+                self.path_pose_y = data.pose.pose.position.y
+                path_line = [str(self.path_no), str(self.path_pose_x), str(self.path_pose_y)]
+                writer = csv.writer(f, lineterminator='\n')
+                writer.writerow(path_line)
+            self.path_no += 1
 
     def callback(self, data):
         try:
