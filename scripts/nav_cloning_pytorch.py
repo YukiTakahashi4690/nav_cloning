@@ -20,9 +20,10 @@ from yaml import load
 
 
 # HYPER PARAM
+BATCH_SIZE = 1151*3
 # BATCH_SIZE = 8
 # BATCH_SIZE = 916*3
-BATCH_SIZE = 2485*3
+# BATCH_SIZE = 2485*3
 MAX_DATA = 10000
 
 class Net(nn.Module):
@@ -108,6 +109,7 @@ class deep_learning:
         
     #<make dataset>
         self.dataset = TensorDataset(self.x_cat,self.t_cat)
+        # print(type(self.dataset))
 
     def trains(self):
         self.net.train()

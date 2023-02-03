@@ -63,7 +63,7 @@ class cource_following_learning_node:
         self.path_pose_x = 0
         self.path_pose_y = 0
         self.path_no = 0
-        with open(self.path +  'analysis/path/path_fix4.csv', 'w') as f:
+        with open(self.path +  'analysis/path/tsudanuma_2-3.csv', 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
             writer.writerow(['path_no', 'x(m)','y(m)'])
 
@@ -90,7 +90,7 @@ class cource_following_learning_node:
             print(e)
 
     def path_write(self, data):
-            with open(self.path + 'analysis/path/path_fix4.csv', 'a') as f:
+            with open(self.path + 'analysis/path/tsudanuma_2-3.csv', 'a') as f:
                 self.path_pose_x = data.pose.pose.position.x
                 self.path_pose_y = data.pose.pose.position.y
                 path_line = [str(self.path_no), str(self.path_pose_x), str(self.path_pose_y)]

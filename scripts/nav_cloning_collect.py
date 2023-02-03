@@ -76,8 +76,8 @@ class cource_following_learning_node:
         self.dl = deep_learning(n_action=1)
         
 
-        # with open(self.csv_path + 'traceable_pos_fix.csv', 'r') as fs:
-        with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
+        with open(self.csv_path + 'capture_pos_path.csv', 'r') as fs:
+        # with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
 
@@ -111,9 +111,9 @@ class cource_following_learning_node:
 
     def simple_goal(self):
         #exp2.3
-        list_num = self.save_img_no + 57
+        # list_num = self.save_img_no + 57
         #exp1
-        # list_num = self.save_img_no + 21
+        list_num = self.save_img_no + 14
         if list_num <= len(self.pos_list):
             self.cur_pos = self.pos_list[list_num]
             # self.cur_pos = self.pos_list[self.save_img_no + 14]
@@ -126,8 +126,11 @@ class cource_following_learning_node:
             self.g_pos.header.stamp = rospy.Time.now()
 
             self.g_pos.header.frame_id = 'map'
-            self.g_pos.pose.position.x = x - 11.252
-            self.g_pos.pose.position.y = y - 16.70
+            self.g_pos.pose.position.x = x 
+            self.g_pos.pose.position.y = y
+            #willow#
+            # self.g_pos.pose.position.x = x - 11.252
+            # self.g_pos.pose.position.y = y - 16.70
             self.g_pos.pose.position.z = 0
 
             self.g_pos.pose.orientation.x = 0 
@@ -147,8 +150,12 @@ class cource_following_learning_node:
             self.pos.header.stamp = rospy.Time.now()
 
             self.pos.header.frame_id = 'map'
-            self.pos.pose.pose.position.x = x - 11.252
-            self.pos.pose.pose.position.y = y - 16.70
+            #tsudanuma2-3#
+            self.pos.pose.pose.position.x = x
+            self.pos.pose.pose.position.y = y
+            #willow#
+            # self.pos.pose.pose.position.x = x - 11.252
+            # self.pos.pose.pose.position.y = y - 16.70
 
             quaternion_ = tf.transformations.quaternion_from_euler(0, 0, angle)
 
@@ -228,9 +235,9 @@ class cource_following_learning_node:
                     ## dy 0.05 ##
                     # if offset_ang == 0 and self.save_img_no % 13 == 0:
                     #exp2.3
-                    if offset_ang == 0 and self.save_img_no % 19 == 0:
+                    # if offset_ang == 0 and self.save_img_no % 19 == 0:
                     #exp1
-                    # if offset_ang == 0 and self.save_img_no % 7 == 0:
+                    if offset_ang == 0 and self.save_img_no % 7 == 0:
                         # os.system('rosservice call /move_base/clear_costmaps')
                         self.simple_goal()
                     # elif self.clear_no == 4 and offset_ang == 7:
@@ -240,8 +247,8 @@ class cource_following_learning_node:
                     # if offset_ang == -7:
                     if offset_ang == -5:
                         self.amcl_pose_pub.publish(self.pos)
-                        if self.save_img_no % 19 == 0:
-                        # if self.save_img_no % 7 == 0:
+                        # if self.save_img_no % 19 == 0:
+                        if self.save_img_no % 21 == 0:
                             self.amcl_pose_pub.publish(self.pos)
 
                     #test

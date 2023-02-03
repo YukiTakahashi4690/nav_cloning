@@ -6,16 +6,19 @@
   <arg name="open_rviz" default="true"/>
   <arg name="move_forward_only" default="false"/>
   <arg name="waypoints_file" default="/home/masaya/maps/waypoints_willow.yaml"/>
-  <arg name="dist_err" default="0.3"/>
-  <!-- <arg name="dist_err" default="0.4"/> -->
-  <arg name="initial_pose_x" default="-10.78" />
-  <arg name="initial_pose_y" default="-16.78" />
-  <!-- <arg name="initial_pose_x" default="0.390213" />
-  <arg name="initial_pose_y" default="1.928858" /> -->
-  <arg name="initial_pose_a" default="0.0" />
+  <!-- <arg name="dist_err" default="0.3"/> -->
+  <arg name="dist_err" default="0.6"/>
+  <!--willow_garage-->
+  <!-- <arg name="initial_pose_x" default="-10.78" />
+  <arg name="initial_pose_y" default="-16.78" /> -->
+  <!--tsudanuma_2-3-->
+  <arg name="initial_pose_x" default="-9.5" />
+  <arg name="initial_pose_y" default="29" />
+  <arg name="initial_pose_a" default="-1.57" />
+  
   <arg name="use_waypoint_nav" default="true" />
   <arg name="rate" default="3.0"/>
-  <arg name="loop" default="false"/>
+  <arg name="loop" default="true"/>
 
   <!-- Turtlebot3 -->
   <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch">
