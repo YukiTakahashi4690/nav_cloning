@@ -11,9 +11,9 @@ class target_path:
         rospy.init_node('target_path', anonymous=True)
         self.image = cv2.imread(roslib.packages.get_pkg_dir('nav_cloning')+'/maps/willowgarage.pgm')
         self.image_resize = cv2.resize(self.image, (600, 600))
-        self.file_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/trajectory/exp1.2/8000_1.csv'
+        self.file_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/path/path_willow_shirasu.csv'
         self.save_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/draw_maps/"
-        self.image_name = "exp1.2_8000_1"
+        self.image_name = "path_willow_shirasu"
         self.path_x = []
         self.path_y = []
         self.pos_x = 0

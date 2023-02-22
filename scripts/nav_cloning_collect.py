@@ -50,14 +50,14 @@ class cource_following_learning_node:
         self.cv_right_image = np.zeros((480,640,3), np.uint8)
         self.init = True
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
-        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/'
+        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/'
         self.collect_data_srv = rospy.Service('/collect_data', Trigger, self.collect_data)
-        self.goal_pub_srv = rospy.Service('/goal_pub', Trigger, self.goal_pub)
+        # self.goal_pub_srv = rospy.Service('/goal_pub', Trigger, self.goal_pub)
         self.save_img_no = 0
-        self.clear_no = 0       
-        self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/path/'
+        self.goal_rate = 3
+        self.offset_ang = 0      
+        self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/path/'
         self.pos_list = []
-        self.goal_list = []
         self.cur_pos = []
         self.pos = PoseWithCovarianceStamped()
         self.g_pos = PoseStamped()
@@ -71,12 +71,12 @@ class cource_following_learning_node:
         self.state.model_name = 'mobile_base'
         self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
         self.simple_goal_pub = rospy.Publisher('move_base_simple/goal', PoseStamped, queue_size=10)
-        os.makedirs(self.path + "analysis/img/" + self.start_time)
-        os.makedirs(self.path + "analysis/ang/" + self.start_time)
+        os.makedirs(self.path + "img/" + self.start_time)
+        os.makedirs(self.path + "ang/" + self.start_time)
         self.dl = deep_learning(n_action=1)
         
 
-        with open(self.csv_path + 'capture_pos_path.csv', 'r') as fs:
+        with open(self.csv_path + 'capture_pos_00_01.csv', 'r') as fs:
         # with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
@@ -84,19 +84,22 @@ class cource_following_learning_node:
     def capture_img(self):
             Flag = True
             try:
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_resized)
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_right_resized)
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_left_resized)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_resized)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_right_resized)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_left_resized)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.name_no) + "_" + self.ang_no + ".jpg", self.im_resized)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.name_no) + "_" + self.ang_no + ".jpg", self.im_right_resized)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.name_no) + "_" + self.ang_no + ".jpg", self.im_left_resized)
             except:
                 print('Not save image')
                 Flag = False
             finally:
                 if Flag:
-                    print('Save image Number:', self.save_img_no)
+                    print('Save image Number:', self.name_no)
 
     def capture_ang(self):
-            line = [str(self.save_img_no), str(self.action)]
-            with open(self.path + "analysis/ang/" + self.start_time + '/ang.csv', 'a') as f:
+            line = [str(self.name_no), str(self.action)]
+            with open(self.path + "ang/" + self.start_time + '/ang.csv', 'a') as f:
                 writer = csv.writer(f, lineterminator='\n')
                 writer.writerow(line)
     
@@ -113,12 +116,9 @@ class cource_following_learning_node:
         #exp2.3
         # list_num = self.save_img_no + 57
         #exp1
-        list_num = self.save_img_no + 14
+        list_num = self.save_img_no + 24
         if list_num <= len(self.pos_list):
             self.cur_pos = self.pos_list[list_num]
-            # self.cur_pos = self.pos_list[self.save_img_no + 14]
-            # self.cur_pos = self.pos_list[self.save_img_no + 21]
-            # self.cur_pos = self.pos_list[self.save_img_no + 52]
             simple_pos = self.cur_pos.split(',')
             x = float(simple_pos[1])
             y = float(simple_pos[2])
@@ -126,11 +126,12 @@ class cource_following_learning_node:
             self.g_pos.header.stamp = rospy.Time.now()
 
             self.g_pos.header.frame_id = 'map'
-            self.g_pos.pose.position.x = x 
-            self.g_pos.pose.position.y = y
+            #cit2-3#
+            # self.g_pos.pose.position.x = x 
+            # self.g_pos.pose.position.y = y
             #willow#
-            # self.g_pos.pose.position.x = x - 11.252
-            # self.g_pos.pose.position.y = y - 16.70
+            self.g_pos.pose.position.x = x - 11.252
+            self.g_pos.pose.position.y = y - 16.70
             self.g_pos.pose.position.z = 0
 
             self.g_pos.pose.orientation.x = 0 
@@ -146,16 +147,15 @@ class cource_following_learning_node:
     def robot_moving(self, x, y, angle):
             #amcl
             #replace_pose = PoseWithCovarianceStamped()
-
             self.pos.header.stamp = rospy.Time.now()
 
             self.pos.header.frame_id = 'map'
             #tsudanuma2-3#
-            self.pos.pose.pose.position.x = x
-            self.pos.pose.pose.position.y = y
+            # self.pos.pose.pose.position.x = x
+            # self.pos.pose.pose.position.y = y
             #willow#
-            # self.pos.pose.pose.position.x = x - 11.252
-            # self.pos.pose.pose.position.y = y - 16.70
+            self.pos.pose.pose.position.x = x - 11.252
+            self.pos.pose.pose.position.y = y - 16.70
 
             quaternion_ = tf.transformations.quaternion_from_euler(0, 0, angle)
 
@@ -168,10 +168,10 @@ class cource_following_learning_node:
             # self.pos.pose.covariance = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
 
             # self.amcl_pose_pub.publish(self.pos)
+            
             #gazebo
-            # for offset_ang in [-7, -5, -3, 0, 3, 5, 7]:
-            for offset_ang in [-5, 0, 5]:
-                the = angle + math.radians(offset_ang)
+            for self.offset_ang in [-5, 0, 5]:
+                the = angle + math.radians(self.offset_ang)
                 the = the - 2.0 * math.pi if the >  math.pi else the
                 the = the + 2.0 * math.pi if the < -math.pi else the
                 self.state.pose.position.x = x
@@ -181,31 +181,19 @@ class cource_following_learning_node:
                 self.state.pose.orientation.y = quaternion[1]
                 self.state.pose.orientation.z = quaternion[2]
                 self.state.pose.orientation.w = quaternion[3]
-
-                # if offset_ang == -7:
-                #     self.ang_no = "-7"
                 
-                if offset_ang == -5:
+                if self.offset_ang == -5:
                     self.ang_no = "-5"
 
-                # if offset_ang == -3:
-                #     self.ang_no = "-3"
-
-                if offset_ang == 0:
+                if self.offset_ang == 0:
                     self.ang_no = "0"
 
-                # if offset_ang == +3:
-                #     self.ang_no = "+3"
-
-                if offset_ang == +5:
+                if self.offset_ang == +5:
                     self.ang_no = "+5"
-
-                # if offset_ang == +7:
-                #     self.ang_no = "+7"
 
                 try:
                     set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
-                    resp = set_state( self.state )
+                    resp = set_state(self.state)
 
                     # self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
                     self.im_resized = cv2.resize(self.cv_image, dsize=(64, 48))
@@ -230,27 +218,19 @@ class cource_following_learning_node:
                     # self.dl.make_dataset(imgobj_left, self.action - 0.2)
                     # self.dl.make_dataset(imgobj_right, self.action + 0.2)
 
-                    ## dist 0.5 dy 0.1 ##
-                    # if offset_ang == 0 and self.save_img_no % 7 == 0:
-                    ## dy 0.05 ##
-                    # if offset_ang == 0 and self.save_img_no % 13 == 0:
-                    #exp2.3
-                    # if offset_ang == 0 and self.save_img_no % 19 == 0:
-                    #exp1
-                    if offset_ang == 0 and self.save_img_no % 7 == 0:
-                        # os.system('rosservice call /move_base/clear_costmaps')
-                        self.simple_goal()
-                    # elif self.clear_no == 4 and offset_ang == 7:
-                    #     os.system('rosservice call /move_base/clear_costmaps')
-                    #     self.clear_no = -3
-                    
-                    # if offset_ang == -7:
-                    if offset_ang == -5:
-                        self.amcl_pose_pub.publish(self.pos)
-                        # if self.save_img_no % 19 == 0:
-                        if self.save_img_no % 21 == 0:
-                            self.amcl_pose_pub.publish(self.pos)
+                    # if self.offset_ang == 0 and self.save_img_no % 3 == 0:
+                    #     self.simple_goal()
 
+                    if self.offset_ang == 0 and self.save_img_no % self.goal_rate == 0:
+                        self.simple_goal()
+
+                    # if self.save_img_no % self.goal_rate != 0:
+                    #     self.capture_img()
+                    #     self.capture_ang()
+                    
+                    if self.offset_ang == -5:
+                        self.amcl_pose_pub.publish(self.pos)
+                  
                     #test
                     self.capture_img()
                     self.capture_ang()
@@ -259,45 +239,31 @@ class cource_following_learning_node:
                 self.r.sleep()
                 self.r.sleep()
                 self.r.sleep()
-                # self.r.sleep()
-                # self.r.sleep()
-                # self.r.sleep()
-            
+
             self.r.sleep()
             self.r.sleep()
             self.r.sleep()
         
 
-    def goal_pub(self):
-        rospy.wait_for_service('/goal_pub')
-        service = rospy.ServiceProxy('/goal_pub', Trigger)
-        self.simple_goal()
+    # def goal_pub(self):
+    #     rospy.wait_for_service('/goal_pub')
+    #     service = rospy.ServiceProxy('/goal_pub', Trigger)
+    #     self.simple_goal()
     
     def collect_data(self, data):
         rospy.wait_for_service('/collect_data')
         service = rospy.ServiceProxy('/collect_data', Trigger)
-        self.goal_pub()
+        # self.goal_pub()
+        self.simple_goal()
 
         for i in range(len(self.pos_list)):
             x, y, theta = self.read_csv()
             self.robot_moving(x, y, theta)
             # print("current_position:", x, y, theta)
-
             self.save_img_no += 1
-            # self.clear_no += 1
-            # print("clear_no", self.clear_no)
             self.capture_rate.sleep()
 
-            ##dist 0.1 dy 0.1 ##
-            # if i == len(self.pos_list) - 11:
-            ## dist 0.25 ##
-            # if i == len(self.pos_list) - 18:
-            ##dist 0.25 dy 0.05 ##
-            # if i == len(self.pos_list) - 59:
             if i == len(self.pos_list):
-                # for j in range(4000):
-                #     self.dl.trains()
-                # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")
                 os.system('killall roslaunch')
                 sys.exit()
 

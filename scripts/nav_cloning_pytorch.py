@@ -20,10 +20,8 @@ from yaml import load
 
 
 # HYPER PARAM
-BATCH_SIZE = 1151*3
+BATCH_SIZE = 1677*3
 # BATCH_SIZE = 8
-# BATCH_SIZE = 916*3
-# BATCH_SIZE = 2485*3
 MAX_DATA = 10000
 
 class Net(nn.Module):
@@ -96,6 +94,7 @@ class deep_learning:
         #self.writer = SummaryWriter(log_dir="/home/haru/nav_ws/src/nav_cloning/runs",comment="log_1")
 
     def make_dataset(self,img,target_angle):
+        # self.device = torch.device('cpu')
         if self.first_flag:
             self.x_cat = torch.tensor(img,dtype=torch.float32, device=self.device).unsqueeze(0)
             self.x_cat=self.x_cat.permute(0,3,1,2)
@@ -112,6 +111,7 @@ class deep_learning:
         # print(type(self.dataset))
 
     def trains(self):
+        # self.device = torch.device('cuda')
         self.net.train()
         train_dataset = DataLoader(self.dataset, batch_size=BATCH_SIZE, generator=torch.Generator('cpu'),shuffle=True)
         
@@ -143,6 +143,7 @@ class deep_learning:
         return action_value_training[0][0].item(), loss
 
     def act(self, img):
+            # self.device = torch.device('cuda')
             self.net.eval()
         #<make img(x_test_ten),cmd(c_test)>
             # x_test_ten = torch.tensor(self.transform(img),dtype=torch.float32, device=self.device).unsqueeze(0)
@@ -161,9 +162,10 @@ class deep_learning:
 
     def save(self, save_path):
         #<model save>
-        path = save_path + time.strftime("%Y%m%d_%H:%M:%S")
-        os.makedirs(path)
-        torch.save(self.net.state_dict(), path + '/model_gpu.pt')
+        # path = save_path + time.strftime("%Y%m%d_%H:%M:%S")
+        # os.makedirs(path)
+        # torch.save(self.net.state_dict(), path + '/model_gpu.pt')
+        torch.save(self.net.state_dict(), save_path)
 
 
     def load(self, load_path):

@@ -9,12 +9,13 @@
   <!-- <arg name="dist_err" default="0.3"/> -->
   <arg name="dist_err" default="0.6"/>
   <!--willow_garage-->
-  <!-- <arg name="initial_pose_x" default="-10.78" />
-  <arg name="initial_pose_y" default="-16.78" /> -->
+  <arg name="initial_pose_x" default="-10.78" />
+  <arg name="initial_pose_y" default="-16.78" />
+  <arg name="initial_pose_a" default="0.0" />
   <!--tsudanuma_2-3-->
-  <arg name="initial_pose_x" default="-9.5" />
-  <arg name="initial_pose_y" default="29" />
-  <arg name="initial_pose_a" default="-1.57" />
+  <!-- <arg name="initial_pose_x" default="-9.5" />
+  <arg name="initial_pose_y" default="29" /> -->
+  <!-- <arg name="initial_pose_a" default="-1.57" /> -->
   
   <arg name="use_waypoint_nav" default="true" />
   <arg name="rate" default="3.0"/>
