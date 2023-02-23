@@ -17,7 +17,7 @@
   <arg name="initial_pose_y" default="29" /> -->
   <!-- <arg name="initial_pose_a" default="-1.57" /> -->
   
-  <arg name="use_waypoint_nav" default="true" />
+  <arg name="use_waypoint_nav" default="false" />
   <arg name="rate" default="3.0"/>
   <arg name="loop" default="true"/>
 
@@ -54,13 +54,14 @@
     </node>
   </group> -->
 
-  <!-- <group if="$(arg use_waypoint_nav)">
-    <node name="waypoint_nav" pkg="waypoint_nav" type="waypoint_navigator" output="screen">
+  <group if="$(arg use_waypoint_nav)">
+    <!-- <node name="waypoint_nav" pkg="waypoint_nav" type="waypoint_navigator" output="screen"> -->
+    <node name="waypoint_nav" pkg="waypoint_nav" type="waypoint_navigator_with_number" output="screen">
       <param name="filename" value="$(arg waypoints_file)"/>
       <param name="dist_err" value="$(arg dist_err)"/>
       <param name="max_update_rate" value="$(arg rate)"/>
       <param name="loop_flag" value="$(arg loop)"/>    </node>
-  </group> -->
+  </group>
 
 
   <!-- rviz -->

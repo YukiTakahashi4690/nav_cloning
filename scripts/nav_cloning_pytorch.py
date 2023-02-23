@@ -20,7 +20,8 @@ from yaml import load
 
 
 # HYPER PARAM
-BATCH_SIZE = 1677*3
+BATCH_SIZE = 3354
+# BATCH_SIZE = 1677*3
 # BATCH_SIZE = 8
 MAX_DATA = 10000
 

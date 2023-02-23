@@ -57,7 +57,7 @@ class cource_following_learning_node:
         self.previous_reset_time = 0
         self.start_time_s = rospy.get_time()
         os.makedirs(self.path + self.start_time)
-        self.load_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/00_01/model10/model_gpu.pt")
+        self.load_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/00_4000/model10.pt")
 
         # self.odom_sub = rospy.Subscriber("/tracker", Odometry, self.path_write)
         # self.path_pose_x = 0
