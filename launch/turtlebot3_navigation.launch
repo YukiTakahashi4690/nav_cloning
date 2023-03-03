@@ -17,7 +17,7 @@
   <arg name="initial_pose_y" default="29" /> -->
   <!-- <arg name="initial_pose_a" default="-1.57" /> -->
   
-  <arg name="use_waypoint_nav" default="false" />
+  <arg name="use_waypoint_nav" default="true" />
   <arg name="rate" default="3.0"/>
   <arg name="loop" default="true"/>
 

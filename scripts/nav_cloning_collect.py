@@ -55,6 +55,7 @@ class cource_following_learning_node:
         # self.goal_pub_srv = rospy.Service('/goal_pub', Trigger, self.goal_pub)
         self.save_img_no = 0
         self.goal_rate = 3
+        self.goal_no = 24
         self.offset_ang = 0      
         self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/path/'
         self.pos_list = []
@@ -84,21 +85,18 @@ class cource_following_learning_node:
     def capture_img(self):
             Flag = True
             try:
-                # cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_resized)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_resized)
                 # cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_right_resized)
                 # cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_left_resized)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.name_no) + "_" + self.ang_no + ".jpg", self.im_resized)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.name_no) + "_" + self.ang_no + ".jpg", self.im_right_resized)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.name_no) + "_" + self.ang_no + ".jpg", self.im_left_resized)
             except:
                 print('Not save image')
                 Flag = False
             finally:
                 if Flag:
-                    print('Save image Number:', self.name_no)
+                    print('Save image Number:', self.save_img_no)
 
     def capture_ang(self):
-            line = [str(self.name_no), str(self.action)]
+            line = [str(self.save_img_no), str(self.action)]
             with open(self.path + "ang/" + self.start_time + '/ang.csv', 'a') as f:
                 writer = csv.writer(f, lineterminator='\n')
                 writer.writerow(line)
@@ -115,9 +113,8 @@ class cource_following_learning_node:
     def simple_goal(self):
         #exp2.3
         # list_num = self.save_img_no + 57
-        #exp1
-        list_num = self.save_img_no + 24
-        if list_num <= len(self.pos_list):
+        list_num = self.save_img_no + self.goal_no
+        if list_num < len(self.pos_list):
             self.cur_pos = self.pos_list[list_num]
             simple_pos = self.cur_pos.split(',')
             x = float(simple_pos[1])
@@ -141,6 +138,7 @@ class cource_following_learning_node:
             self.g_pos.pose.orientation.w = 1.001
 
             self.simple_goal_pub.publish(self.g_pos)
+
         else:
             pass
 
@@ -181,7 +179,7 @@ class cource_following_learning_node:
                 self.state.pose.orientation.y = quaternion[1]
                 self.state.pose.orientation.z = quaternion[2]
                 self.state.pose.orientation.w = quaternion[3]
-                
+
                 if self.offset_ang == -5:
                     self.ang_no = "-5"
 
@@ -218,11 +216,12 @@ class cource_following_learning_node:
                     # self.dl.make_dataset(imgobj_left, self.action - 0.2)
                     # self.dl.make_dataset(imgobj_right, self.action + 0.2)
 
-                    # if self.offset_ang == 0 and self.save_img_no % 3 == 0:
+                    # if self.offset_ang == 0 and self.save_img_no % self.goal_rate == 0:
                     #     self.simple_goal()
 
-                    if self.offset_ang == 0 and self.save_img_no % self.goal_rate == 0:
+                    if self.save_img_no % self.goal_rate == 0:
                         self.simple_goal()
+                        self.amcl_pose_pub.publish(self.pos)
 
                     # if self.save_img_no % self.goal_rate != 0:
                     #     self.capture_img()

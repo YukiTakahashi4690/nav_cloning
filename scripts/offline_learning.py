@@ -17,9 +17,9 @@ class cource_following_learning_node:
         self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.model_num)+".pt")
         # self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/00_4000/model"+str(self.model_num)+".pt")
         self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/"+str(self.pro)+"/")
-        self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/img/"+str(self.pro)+"/right")
+        # self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/img/"+str(self.pro)+"/right")
         self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/img/"+str(self.pro)+"/center")
-        self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/img/"+str(self.pro)+"/left")
+        # self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/img/"+str(self.pro)+"/left")
         self.learn_no = 4000
         self.pos_no = 0
         self.data = 1677
@@ -30,20 +30,18 @@ class cource_following_learning_node:
 
     def learn(self):
         ang_list = []
-        img_right_list = []
+        # img_right_list = []
         img_list = []
-        img_left_list = []
+        # img_left_list = []
         #tsudanuma_2-3
         for i in range(self.data):
             for j in ["-5", "0", "+5"]:
-            # for j in ["-7", "-5", "-3", "0", "+3", "+5", "+7"]:
-            # for j in ["center", "right", "left"]:
-                img_right = cv2.imread(self.img_right_path + str(i) + "_" + j + ".jpg")
+                # img_right = cv2.imread(self.img_right_path + str(i) + "_" + j + ".jpg")
                 img = cv2.imread(self.img_path + str(i) + "_" + j + ".jpg")
-                img_left = cv2.imread(self.img_left_path + str(i) + "_" + j + ".jpg")
-                img_right_list.append(img_right)
+                # img_left = cv2.imread(self.img_left_path + str(i) + "_" + j + ".jpg")
+                # img_right_list.append(img_right)
                 img_list.append(img)
-                img_left_list.append(img_left)
+                # img_left_list.append(img_left) 
 
         with open(self.ang_path + 'ang.csv', 'r') as f:
             for row in csv.reader(f):
@@ -51,22 +49,22 @@ class cource_following_learning_node:
                 ang_list.append(float(tar_ang))
         
         for k in range(self.data * 3):
-            img_right = img_right_list[k]
+            # img_right = img_right_list[k]
             img = img_list[k]
-            img_left = img_left_list[k]
+            # img_left = img_left_list[k]
             target_ang = ang_list[k]
 
-            img_right = resize(img_right, (48, 64), mode='constant')
-            r, g, b = cv2.split(img_right)
-            imgobj_right = np.asanyarray([r, g, b])
+            # img_right = resize(img_right, (48, 64), mode='constant')
+            # r, g, b = cv2.split(img_right)
+            # imgobj_right = np.asanyarray([r, g, b])
 
             img = resize(img, (48, 64), mode='constant')
             r, g, b = cv2.split(img)
             imgobj = np.asanyarray([r, g, b])
 
-            img_left = resize(img_left, (48, 64), mode='constant')
-            r, g, b = cv2.split(img_left)
-            imgobj_left = np.asanyarray([r, g, b])
+            # img_left = resize(img_left, (48, 64), mode='constant')
+            # r, g, b = cv2.split(img_left)
+            # imgobj_left = np.asanyarray([r, g, b])
             
             """
             self.dl.make_dataset(imgobj_right, target_ang + 0.2)
@@ -87,13 +85,14 @@ class cource_following_learning_node:
             #     print("--------------------")
             #     pass
             # else:
-            if k % 3 == 0:
-                pass
-            else:
-                self.dl.make_dataset(img_right, target_ang + 0.2)
-                self.dl.make_dataset(img, target_ang)
-                self.dl.make_dataset(img_left, target_ang - 0.2)
-                print("dataset:" + str(k))
+            
+            # if k % 3 == 0:
+            #     pass
+            # else:
+            # self.dl.make_dataset(img_right, target_ang + 0.2)
+            self.dl.make_dataset(img, target_ang)
+            # self.dl.make_dataset(img_left, target_ang - 0.2)
+            print("dataset:" + str(k))
         # joblib.dump((self.dataset_right, self.dataset_center, self.dataset_left), open('/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/dataset/dataset.pkl', 'wb'), compress=6)
 
         # self.dataset_right, self.dataset_center, self.dataset_left =joblib.load(open('/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/dataset/dataset.pkl', 'rb'))
