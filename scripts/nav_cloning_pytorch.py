@@ -20,11 +20,8 @@ from yaml import load
 
 
 # HYPER PARAM
-#only 01
-# BATCH_SIZE = 3354
-BATCH_SIZE = 1677*3
+# BATCH_SIZE = 1677 * 3
 # BATCH_SIZE = 8
-# BATCH_SIZE = 1677
 MAX_DATA = 10000
 
 class Net(nn.Module):
@@ -113,7 +110,7 @@ class deep_learning:
         self.dataset = TensorDataset(self.x_cat,self.t_cat)
         # print(type(self.dataset))
 
-    def trains(self):
+    def trains(self, BATCH_SIZE):
         # self.device = torch.device('cuda')
         self.net.train()
         train_dataset = DataLoader(self.dataset, batch_size=BATCH_SIZE, generator=torch.Generator('cpu'),shuffle=True)

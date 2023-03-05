@@ -14,7 +14,7 @@ class calc_capture_pos:
 
     def calc_pos(self):
         offset_angle = 0
-        with open(self.path +  'capture_pos_00_01.csv', 'a') as fw:
+        with open(self.path + '00_03.csv', 'a') as fw:
             writer = csv.writer(fw, lineterminator='\n')
             i = 0
             with open(self.path +  'path_willow_shirasu.csv', 'r') as fr:
@@ -32,7 +32,7 @@ class calc_capture_pos:
                                 direction = angle + math.pi / 180 * offset_angle
                                 direction = direction - 2.0 * math.pi if direction >  math.pi else direction
                                 direction = direction + 2.0 * math.pi if direction < -math.pi else direction
-                                for dy in [-0.1, 0.0, 0.1]:
+                                for dy in [-0.3, 0.0, 0.3]:
                                 # for dy in [-0.3, -0.2, -0.15, -0.1, -0.08, -0.06, -0.04, -0.02, -0.01, 0.0, 0.01, 0.02, 0.04, 0.06, 0.08, 0.1, 0.15, 0.2, 0.3]:
                                     line = [str(self.path_no), str(x-dy*math.sin(angle)), str(y+dy*math.cos(angle)), str(direction)]
                                     writer.writerow(line)

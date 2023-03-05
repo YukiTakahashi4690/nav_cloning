@@ -37,8 +37,8 @@ class cource_following_learning_node:
         rospy.init_node('cource_following_learning_node', anonymous=True)
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.callback)
-        self.image_left_sub = rospy.Subscriber("/camera_left/rgb/image_raw", Image, self.callback_left_camera)
-        self.image_right_sub = rospy.Subscriber("/camera_right/rgb/image_raw", Image, self.callback_right_camera)
+        # self.image_left_sub = rospy.Subscriber("/camera_left/rgb/image_raw", Image, self.callback_left_camera)
+        # self.image_right_sub = rospy.Subscriber("/camera_right/rgb/image_raw", Image, self.callback_right_camera)
         self.vel_sub = rospy.Subscriber("/nav_vel", Twist, self.callback_vel)
         self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
         self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
@@ -77,7 +77,7 @@ class cource_following_learning_node:
         self.dl = deep_learning(n_action=1)
         
 
-        with open(self.csv_path + 'capture_pos_00_01.csv', 'r') as fs:
+        with open(self.csv_path + '00_03.csv', 'r') as fs:
         # with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
@@ -169,6 +169,7 @@ class cource_following_learning_node:
             
             #gazebo
             for self.offset_ang in [-5, 0, 5]:
+            # for self.offset_ang in [0]:
                 the = angle + math.radians(self.offset_ang)
                 the = the - 2.0 * math.pi if the >  math.pi else the
                 the = the + 2.0 * math.pi if the < -math.pi else the
@@ -196,10 +197,11 @@ class cource_following_learning_node:
                     # self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
                     self.im_resized = cv2.resize(self.cv_image, dsize=(64, 48))
                     # self.cv_right_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-                    self.im_right_resized = cv2.resize(self.cv_right_image, dsize=(64, 48))
+                    # self.im_right_resized = cv2.resize(self.cv_right_image, dsize=(64, 48))
                     # self.cv_left_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-                    self.im_left_resized = cv2.resize(self.cv_left_image, dsize=(64, 48))
+                    # self.im_left_resized = cv2.resize(self.cv_left_image, dsize=(64, 48))
                     
+                    ###chainer##
                     # self.img = resize(self.cv_image, (48, 64), mode='constant')
                     # r, g, b = cv2.split(img)
                     # imgobj = np.asanyarray([r, g, b])
@@ -211,23 +213,25 @@ class cource_following_learning_node:
                     # self.img_right = resize(self.cv_right_image, (48, 64), mode='constant')
                     # r, g, b = cv2.split(img_right)
                     # imgobj_right = np.asanyarray([r, g, b])
-                    
+                    ############
+
                     # self.dl.make_dataset(imgobj, self.action)
                     # self.dl.make_dataset(imgobj_left, self.action - 0.2)
                     # self.dl.make_dataset(imgobj_right, self.action + 0.2)
 
-                    # if self.offset_ang == 0 and self.save_img_no % self.goal_rate == 0:
-                    #     self.simple_goal()
-
-                    if self.save_img_no % self.goal_rate == 0:
+                    if self.offset_ang == 0 and self.save_img_no % self.goal_rate == 0:
                         self.simple_goal()
                         self.amcl_pose_pub.publish(self.pos)
+
+                    # if self.save_img_no % self.goal_rate == 0:
+                    #     self.simple_goal()
+                    #     self.amcl_pose_pub.publish(self.pos)
 
                     # if self.save_img_no % self.goal_rate != 0:
                     #     self.capture_img()
                     #     self.capture_ang()
                     
-                    if self.offset_ang == -5:
+                    if self.offset_ang == -5 or self.offset_ang == +5:
                         self.amcl_pose_pub.publish(self.pos)
                   
                     #test
@@ -272,17 +276,17 @@ class cource_following_learning_node:
         except CvBridgeError as e:
             print(e)
 
-    def callback_left_camera(self, data):
-        try:
-            self.cv_left_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-        except CvBridgeError as e:
-            print(e)
+    # def callback_left_camera(self, data):
+    #     try:
+    #         self.cv_left_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+    #     except CvBridgeError as e:
+    #         print(e)
 
-    def callback_right_camera(self, data):
-        try:
-            self.cv_right_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-        except CvBridgeError as e:
-            print(e)
+    # def callback_right_camera(self, data):
+    #     try:
+    #         self.cv_right_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+    #     except CvBridgeError as e:
+    #         print(e)
 
     def callback_vel(self, data):
         self.vel = data

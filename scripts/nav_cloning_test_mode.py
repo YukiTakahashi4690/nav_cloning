@@ -63,7 +63,7 @@ class nav_cloning_node:
         self.learning = False
         self.select_dl = False
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
-        self.pro = "00_01_camera1"
+        self.pro = "01"
         # self.load_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.num)+"/"+"model_gpu.pt"
         self.load_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.num)+".pt"
         self.score = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/score/"+str(self.pro)+".csv"
@@ -215,7 +215,7 @@ class nav_cloning_node:
             #         sys.exit()
         self.old_wp = self.current_wp
 
-        if self.lap == 4:
+        if self.lap == 2:
             line = ['model_'+str(self.num), 'True', str(self.lap)]
             with open(self.score, 'a') as f:
                 writer = csv.writer(f, lineterminator='\n')

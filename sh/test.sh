@@ -1,4 +1,4 @@
-for i in `seq 3 10`
+for i in `seq 1 10`
 do
     echo "$i"
     roslaunch nav_cloning nav_cloning_sim.launch script:="nav_cloning_test_mode.py" num:="$i"
