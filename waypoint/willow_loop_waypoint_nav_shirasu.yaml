@@ -20,6 +20,11 @@ waypoints:
         z: -0.000243187
         function: run
     - point:
+        x: 14.6202
+        y: -16.4712
+        z: -0.000243187
+        function: run
+    - point:
         x: 14.8332
         y: -14.1348
         z: -0.000244141
@@ -54,4 +59,3 @@ waypoints:
         y: -14.3755
         z: 0
         function: run
-

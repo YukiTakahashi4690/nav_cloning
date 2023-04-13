@@ -13,7 +13,7 @@ class cource_following_learning_node:
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
         # os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time)
         self.model_num = str(sys.argv[1])
-        self.pro = "00_01"
+        self.pro = "00_ang_0"
         self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.model_num)+".pt")
         # self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/01/model"+str(self.model_num)+".pt")
         self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/"+str(self.pro)+"/")
@@ -23,9 +23,9 @@ class cource_following_learning_node:
         self.learn_no = 4000
         self.pos_no = 0
         self.count = 0
-        self.data = 1677
-        # os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro), exist_ok=True)
-        # os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/"+str(self.pro)+"/", exist_ok=True)
+        self.data = 560
+        os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro), exist_ok=True)
+        os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/"+str(self.pro)+"/", exist_ok=True)
         
         # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")
 
@@ -36,11 +36,11 @@ class cource_following_learning_node:
         # img_left_list = []
 
         for i in range(self.data):
-            if i % 3 == 0:
-                pass
-            else:
-                # for j in ["0"]:
-                for j in ["-5", "0", "+5"]:
+            # if i % 3 == 0:
+            #     pass
+            # else:
+                for j in ["0"]:
+                # for j in ["-5", "0", "+5"]:
                     # img_right = cv2.imread(self.img_right_path + str(i) + "_" + j + ".jpg")
                     img = cv2.imread(self.img_path + str(i) + "_" + j + ".jpg")
                     # img_left = cv2.imread(self.img_left_path + str(i) + "_" + j + ".jpg")
@@ -53,10 +53,10 @@ class cource_following_learning_node:
         with open(self.ang_path + 'ang.csv', 'r') as f:
             for row in csv.reader(f):
                 no, tar_ang = row
-                if float(no) % 3 == 0:
-                    pass
-                else:    
-                    ang_list.append(float(tar_ang))
+                # if float(no) % 3 == 0:
+                #     pass
+                # else:    
+                ang_list.append(float(tar_ang))
         
         for k in range(self.count):
         # for k in range(self.data):
