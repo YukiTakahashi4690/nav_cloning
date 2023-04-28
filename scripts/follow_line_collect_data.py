@@ -47,9 +47,9 @@ class cource_following_learning_node:
         self.episode = 0
         self.vel = Twist()
         self.path_pose = PoseArray()
-        self.cv_image = np.zeros((480,640,3), np.uint8)
-        self.cv_left_image = np.zeros((480,640,3), np.uint8)
-        self.cv_right_image = np.zeros((480,640,3), np.uint8)
+        self.cv_image = np.zeros((480,689,3), np.uint8)
+        self.cv_left_image = np.zeros((480,689,3), np.uint8)
+        self.cv_right_image = np.zeros((480,689,3), np.uint8)
         self.learning = True
         self.select_dl = False
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
@@ -86,9 +86,18 @@ class cource_following_learning_node:
     def capture_img(self):
             Flag = True
             try:
-                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + ".jpg", self.cv_image)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + ".jpg", self.cv_right_image)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + ".jpg", self.cv_left_image)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_left_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_left_center_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_right_img)
+
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_right_img)
+
+                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_right_center_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_right_right_img)
+  
             except:
                 print('Not save image')
                 Flag = False
@@ -183,6 +192,30 @@ class cource_following_learning_node:
     def loop(self):
         self.check_distance()
         if self.flag:
+            self.crop_left_left_img = self.cv_left_image[0:480, 0:640]
+            self.crop_left_center_img = self.cv_left_image[0:480, 25:665]
+            self.crop_left_right_img = self.cv_left_image[0:480, 50:690]
+
+            self.crop_left_img = self.cv_image[0:480, 0:640]
+            self.crop_img = self.cv_image[0:480, 25:665]
+            self.crop_right_img = self.cv_image[0:480, 50:690]
+
+            self.crop_right_left_img = self.cv_right_image[0:480, 0:640]
+            self.crop_right_center_img = self.cv_right_image[0:480, 25:665]
+            self.crop_right_right_img = self.cv_right_image[0:480, 50:69]
+
+            self.resize_left_left_img = cv2.resize(self.crop_left_left_img, dsize=(64, 48))
+            self.resize_left_center_img = cv2.resize(self.crop_left_center_img, dsize=(64, 48))
+            self.resize_left_right_img = cv2.resize(self.crop_left_right_img, dsize=(64, 48))
+
+            self.resize_left_img = cv2.resize(self.crop_left_img, dsize=(64, 48))
+            self.resize_img = cv2.resize(self.crop_img, dsize=(64, 48))
+            self.resize_right_img = cv2.resize(self.crop_right_img, dsize=(64, 48))
+
+            self.resize_right_left_img = cv2.resize(self.crop_right_left_img, dsize=(64, 48))
+            self.resize_right_center_img = cv2.resize(self.crop_right_center_img, dsize=(64, 48))
+            self.resize_right_right_img = cv2.resize(self.crop_right_right_img, dsize=(64, 48))
+
             self.capture_img()
             self.capture_ang()
             self.save_img_no += 1
@@ -206,32 +239,32 @@ class cource_following_learning_node:
         if self.vel.linear.x == 0:
             return
 
-        img = resize(self.cv_image, (48, 64), mode='constant')
-        r, g, b = cv2.split(img)
-        imgobj = np.asanyarray([r,g,b])
+        # img = resize(self.cv_image, (48, 64), mode='constant')
+        # r, g, b = cv2.split(img)
+        # imgobj = np.asanyarray([r,g,b])
 
-        img_left = resize(self.cv_left_image, (48, 64), mode='constant')
-        r, g, b = cv2.split(img_left)
-        imgobj_left = np.asanyarray([r,g,b])
+        # img_left = resize(self.cv_left_image, (48, 64), mode='constant')
+        # r, g, b = cv2.split(img_left)
+        # imgobj_left = np.asanyarray([r,g,b])
 
-        img_right = resize(self.cv_right_image, (48, 64), mode='constant')
-        r, g, b = cv2.split(img_right)
-        imgobj_right = np.asanyarray([r,g,b])
+        # img_right = resize(self.cv_right_image, (48, 64), mode='constant')
+        # r, g, b = cv2.split(img_right)
+        # imgobj_right = np.asanyarray([r,g,b])
 
-        ros_time = str(rospy.Time.now())
+        # ros_time = str(rospy.Time.now())
 
         if self.episode == 4000:
             self.learning = False
             #self.dl.save(self.save_path)
             #self.dl.load(self.load_path)
 
-        temp = copy.deepcopy(img)
-        cv2.imshow("Resized Image", temp)
-        temp = copy.deepcopy(img_left)
-        cv2.imshow("Resized Left Image", temp)
-        temp = copy.deepcopy(img_right)
-        cv2.imshow("Resized Right Image", temp)
-        cv2.waitKey(1)
+        # temp = copy.deepcopy(img)
+        # cv2.imshow("Resized Image", temp)
+        # temp = copy.deepcopy(img_left)
+        # cv2.imshow("Resized Left Image", temp)
+        # temp = copy.deepcopy(img_right)
+        # cv2.imshow("Resized Right Image", temp)
+        # cv2.waitKey(1)
 
 if __name__ == '__main__':
     rg = cource_following_learning_node()

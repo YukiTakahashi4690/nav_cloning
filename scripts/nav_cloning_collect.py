@@ -77,7 +77,7 @@ class cource_following_learning_node:
         self.dl = deep_learning(n_action=1)
         
 
-        with open(self.csv_path + '00.csv', 'r') as fs:
+        with open(self.csv_path + '00_02.csv', 'r') as fs:
         # with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
