@@ -97,9 +97,9 @@ class cource_following_learning_node:
             #     pass
             # else:
 
-            for n in range(3):
-                self.dl.make_dataset(img, target_ang)
-                print("dataset:" + str(k))
+            # for n in range(3):
+            self.dl.make_dataset(img, target_ang)
+            print("dataset:" + str(k))
                 
             # self.dl.make_dataset(img_right, target_ang + 0.2)
             

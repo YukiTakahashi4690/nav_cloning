@@ -6,6 +6,7 @@ from skimage.transform import resize
 import time
 import os
 import sys
+import random 
 
 class cource_following_learning_node:
     def __init__(self):
@@ -23,7 +24,7 @@ class cource_following_learning_node:
         self.learn_no = 4000
         self.pos_no = 0
         self.count = 0
-        self.data = 561
+        self.data = 568
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro), exist_ok=True)
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/"+str(self.pro)+"/", exist_ok=True)
         
@@ -119,28 +120,42 @@ class cource_following_learning_node:
             # imgobj_right = np.asanyarray([r, g, b])
 
             """
-            self.dl.make_dataset(imgobj_right, target_ang + 0.2)
+            self.dl.make_dataset(imgobj_right, target_ang + 0.25)
             self.dl.make_dataset(imgobj, target_ang)
             self.dl.make_dataset(imgobj_left, target_ang - 0.2)
             """
 
-            if 206 <= k <= 221 or 548 <= k <= 554:
-                self.dl.make_dataset(img_left_left, target_ang - 0.2)
-                self.dl.make_dataset(img_left_center, target_ang)
-                self.dl.make_dataset(img_left_right, target_ang + 0.2)
+            if 206 <= k <= 221:
+                self.dl.make_dataset(img_left_left, target_ang -0.024606637656689 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_left_center, target_ang -0.024606637656689 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_left_right, target_ang -0.05744856223464 + random.uniform(-0.01, 0.01))
 
-                self.dl.make_dataset(img_left, target_ang - 0.2)
+                self.dl.make_dataset(img_left, target_ang + 0.221547216176987 + random.uniform(-0.01, 0.01))
                 self.dl.make_dataset(img, target_ang)
-                self.dl.make_dataset(img_right, target_ang + 0.2)
+                self.dl.make_dataset(img_right, target_ang + 0.172295019030571 + random.uniform(-0.01, 0.01))
 
-                self.dl.make_dataset(img_right_left, target_ang - 0.2)
-                self.dl.make_dataset(img_right_center, target_ang)
-                self.dl.make_dataset(img_right_right, target_ang + 0.2)
+                self.dl.make_dataset(img_right_left, target_ang + 0.28765282034874 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right_center, target_ang + 0.303598463535309 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right_right, target_ang - 0.188733771443367 + random.uniform(-0.01, 0.01))
+                print("dataset:" + str(k))
+
+            elif 548 <= k <= 554:
+                self.dl.make_dataset(img_left_left, target_ang -0.237357228994369 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_left_center, target_ang -0.172302231192589 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_left_right, target_ang -0.155905798077583 + random.uniform(-0.01, 0.01))
+
+                self.dl.make_dataset(img_left, target_ang -0.040512323379517 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img, target_ang)
+                self.dl.make_dataset(img_right, target_ang + 0.041017282754183 + random.uniform(-0.01, 0.01))
+
+                self.dl.make_dataset(img_right_left, target_ang - 0.254871308803558 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right_center, target_ang + 0.270691454410553 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right_right, target_ang + 0.205139219760895 + random.uniform(-0.01, 0.01))
                 print("dataset:" + str(k))
 
             # if 884 <= k <= 1092:
             #     for n in range(3):
-            #             self.dl.make_dataset(img_right, target_ang + 0.2)
+            #             self.dl.make_dataset(img_right, target_ang + 0.25)
             #             self.dl.make_dataset(img, target_ang)
             #             self.dl.make_dataset(img_left, target_ang - 0.2)
             #             print("dataset:" + str(k))
@@ -152,18 +167,32 @@ class cource_following_learning_node:
             #     pass
             # else:
 
-            self.dl.make_dataset(img_left_left, target_ang - 0.2)
-            self.dl.make_dataset(img_left_center, target_ang)
-            self.dl.make_dataset(img_left_right, target_ang + 0.2)
+            else:
+                self.dl.make_dataset(img_left_left, target_ang -0.319439560174942 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_left_center, target_ang -0.320055991411209 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_left_right, target_ang -0.237954437732696 + random.uniform(-0.01, 0.01))
 
-            self.dl.make_dataset(img_left, target_ang - 0.2)
-            self.dl.make_dataset(img, target_ang)
-            self.dl.make_dataset(img_right, target_ang + 0.2)
+                self.dl.make_dataset(img_left, target_ang -0.024055354297161 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img, target_ang)
+                self.dl.make_dataset(img_right, target_ang + 0.041019905358553 + random.uniform(-0.01, 0.01))
 
-            self.dl.make_dataset(img_right_left, target_ang - 0.2)
-            self.dl.make_dataset(img_right_center, target_ang)
-            self.dl.make_dataset(img_right_right, target_ang + 0.2)
-            print("dataset:" + str(k))
+                self.dl.make_dataset(img_right_left, target_ang + 0.287183165550232 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right_center, target_ang + 0.254361897706985 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right_right, target_ang - 0.303595423698425 + random.uniform(-0.01, 0.01))
+                print("dataset:" + str(k))
+
+            # self.dl.make_dataset(img_left_left, target_ang -0.25)
+            # self.dl.make_dataset(img_left_center, target_ang -0.25)
+            # self.dl.make_dataset(img_left_right, target_ang -0.25)
+
+            # self.dl.make_dataset(img_left, target_ang -0.002 - random.uniform(-0.001, 0.001))
+            # self.dl.make_dataset(img, target_ang)
+            # self.dl.make_dataset(img_right, target_ang + 0.002 + random.uniform(-0.001, 0.001))
+
+            # self.dl.make_dataset(img_right_left, target_ang + 0.2)
+            # self.dl.make_dataset(img_right_center, target_ang + 0.2)
+            # self.dl.make_dataset(img_right_right, target_ang + 0.2)
+            # print("dataset:" + str(k))
             
         # joblib.dump((self.dataset_right, self.dataset_center, self.dataset_left), open('/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/dataset/dataset.pkl', 'wb'), compress=6)
 

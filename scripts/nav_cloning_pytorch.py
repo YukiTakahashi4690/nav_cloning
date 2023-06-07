@@ -15,7 +15,7 @@ import torch.optim as optim
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-#from torch.utils.tensorboard import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from yaml import load
 
 
@@ -91,7 +91,7 @@ class deep_learning:
         self.transform=transforms.Compose([transforms.ToTensor()])
         self.first_flag =True
         torch.backends.cudnn.benchmark = True
-        #self.writer = SummaryWriter(log_dir="/home/haru/nav_ws/src/nav_cloning/runs",comment="log_1")
+        self.writer = SummaryWriter(log_dir="/home/y-takahashi/catkin_ws/src/nav_cloning/runs",comment="log_1")
 
     def make_dataset(self,img,target_angle):
         # self.device = torch.device('cpu')
@@ -130,6 +130,8 @@ class deep_learning:
         loss = self.criterion(y_train, t_train) 
         loss.backward()
         self.optimizer.step()
+        self.writer.add_scalar("loss", loss.item(), self.count)
+        self.count += 1
         return loss.item()
 
     def act_and_trains(self, img,target_angle):
