@@ -28,7 +28,7 @@ catkin_init_workspace
 cd ../
 catkin_make
 ```
-* nav_cloning_offlineの用意
+* nav_cloningの用意
 ```
 cd ~/catkin_ws/src
 wget https://raw.githubusercontent.com/YukiTakahashi4690/nav_cloning/master/nav_cloning.install
