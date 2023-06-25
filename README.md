@@ -1,7 +1,9 @@
 # nav_cloning
 
 ## Running simulation
-- データ収集
+- データ収集  
+![collect_data_resize](https://github.com/YukiTakahashi4690/nav_cloning/assets/72371474/d3e43a62-31b8-4a51-b581-4c9d201a0ebb)  
+このように目標経路に対してロボットを配置する  
 ```
 nav_cloning nav_cloning_sim.launch script:=nav_cloning_collect.py
 ```
