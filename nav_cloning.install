@@ -1,7 +1,7 @@
 - git:
-    uri: https://github.com/open-rdc/fulanghua_navigation
-    local-name: fulanghua_navigation
-    version: long_period
+    uri: https://github.com/MoriKen254/timed_roslaunch
+    local-name: timed_roslaunch
+    version: melodic-devel
 - git:
     uri: https://github.com/open-rdc/turtlebot3
     local-name: turtlebot3
@@ -19,10 +19,14 @@
     local-name: turtlebot3_gazebo_plugin
     version: master
 - git:
-    uri: https://github.com/MasayaOkada/nav_cloning.git
+    uri: https://github.com/open-rdc/nav_cloning_offline.git
     local-name: nav_cloning
     version: master
 - git:
     uri: https://github.com/ros-planning/navigation.git
     local-name: navigation
     version: melodic-devel
+- git:
+    uri: https://github.com/open-rdc/waypoint_nav
+    local-name: waypoint_nav
+    version: main
