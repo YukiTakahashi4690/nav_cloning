@@ -14,7 +14,7 @@ class cource_following_learning_node:
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
         # os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time)
         self.model_num = str(sys.argv[1])
-        self.pro = "689_480"
+        self.pro = "690_480"
         self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.model_num)+".pt")
         # self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/01/model"+str(self.model_num)+".pt")
         self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/"+str(self.pro)+"/")
@@ -24,7 +24,7 @@ class cource_following_learning_node:
         self.learn_no = 4000
         self.pos_no = 0
         self.count = 0
-        self.data = 568
+        self.data = 570
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro), exist_ok=True)
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/"+str(self.pro)+"/", exist_ok=True)
         
@@ -178,7 +178,7 @@ class cource_following_learning_node:
 
                 self.dl.make_dataset(img_right_left, target_ang + 0.287183165550232 + random.uniform(-0.01, 0.01))
                 self.dl.make_dataset(img_right_center, target_ang + 0.254361897706985 + random.uniform(-0.01, 0.01))
-                self.dl.make_dataset(img_right_right, target_ang - 0.303595423698425 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right_right, target_ang + 0.303595423698425 + random.uniform(-0.01, 0.01))
                 print("dataset:" + str(k))
 
             # self.dl.make_dataset(img_left_left, target_ang -0.25)

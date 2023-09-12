@@ -17,7 +17,7 @@ class calc_capture_pos:
         with open(self.path + '00_02_fix.csv', 'a') as fw:
             writer = csv.writer(fw, lineterminator='\n')
             i = 0
-            with open(self.path +  'path_willow_shirasu.csv', 'r') as fr:
+            with open(self.path + 'willow_trajectory.csv', 'r') as fr:
                 for row in csv.reader(fr):
                     if i >= 1:
                         path_no, str_x, str_y = row

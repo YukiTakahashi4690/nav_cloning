@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="script" default="nav_cloning_node_pytorch.py"/>
+  <arg name="script" default="nav_cloning_test_mode.py"/>
   <!-- <arg name="mode" default="use_dl_output"/> -->
   <!-- <arg name="mode" default="follow_line"/> -->
   <arg name="num" default="1"/>
@@ -11,9 +11,11 @@
   <!-- <arg name="map_file" default="Tsudanuma_2-3.yaml"/> -->
   <arg name="waypoints_file" default="willow_loop_waypoint_nav_shirasu.yaml"/>
   <!-- <arg name="waypoints_file" default="Tsudanuma_2-3_loop.yaml"/> -->
-  <arg name="dist_err" default="0.6"/>
-  <arg name="initial_pose_x" default="-9.5" />
-  <arg name="initial_pose_y" default="-16.0" />
+  <arg name="dist_err" default="0.8"/>
+  <arg name="initial_pose_x" default="-9.20645" />
+  <arg name="initial_pose_y" default="-16.42460" />
+  <!-- <arg name="initial_pose_x" default="-9.5" /> -->
+  <!-- <arg name="initial_pose_y" default="-16.0" /> -->
   <arg name="initial_pose_a" default="0.0" />
   <!-- <arg name="initial_pose_x" default="-9.5" />
   <arg name="initial_pose_y" default="29" />

@@ -41,7 +41,7 @@ class cource_following_learning_node:
         # self.image_right_sub = rospy.Subscriber("/camera_right/rgb/image_raw", Image, self.callback_right_camera)
         self.vel_sub = rospy.Subscriber("/nav_vel", Twist, self.callback_vel)
         self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
-        self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        # self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.min_distance = 0.0
         self.action = 0.0
         self.vel = Twist()
@@ -64,6 +64,7 @@ class cource_following_learning_node:
         self.g_pos = PoseStamped()
         self.orientation = 0
         self.r = rospy.Rate(10)
+        self.s = rospy.Rate(5)
         self.capture_rate = rospy.Rate(0.5)
         # self.capture_rate = rospy.Rate(0.25)
         # self.capture_rate = rospy.Rate(0.15)
@@ -77,7 +78,7 @@ class cource_following_learning_node:
         self.dl = deep_learning(n_action=1)
         
 
-        with open(self.csv_path + '00_01_02.csv', 'r') as fs:
+        with open(self.csv_path + '00_02_fix.csv', 'r') as fs:
         # with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
@@ -127,15 +128,17 @@ class cource_following_learning_node:
             # self.g_pos.pose.position.x = x 
             # self.g_pos.pose.position.y = y
             #willow#
-            self.g_pos.pose.position.x = x - 11.252
-            self.g_pos.pose.position.y = y - 16.70
+            # self.g_pos.pose.position.x = x - 11.252
+            # self.g_pos.pose.position.y = y - 16.70
+            self.g_pos.pose.position.x = x - 10.71378
+            self.g_pos.pose.position.y = y - 17.17456
             self.g_pos.pose.position.z = 0
 
             self.g_pos.pose.orientation.x = 0 
             self.g_pos.pose.orientation.y = 0
             self.g_pos.pose.orientation.z = 0
-            # self.g_pos.pose.orientation.w = 0.999
-            self.g_pos.pose.orientation.w = 1.001
+            self.g_pos.pose.orientation.w = 0.999
+            # self.g_pos.pose.orientation.w = 1.001
 
             self.simple_goal_pub.publish(self.g_pos)
 
@@ -152,8 +155,10 @@ class cource_following_learning_node:
             # self.pos.pose.pose.position.x = x
             # self.pos.pose.pose.position.y = y
             #willow#
-            self.pos.pose.pose.position.x = x - 11.252
-            self.pos.pose.pose.position.y = y - 16.70
+            # self.pos.pose.pose.position.x = x - 11.252
+            # self.pos.pose.pose.position.y = y - 16.70
+            self.pos.pose.pose.position.x = x - 10.71378
+            self.pos.pose.pose.position.y = y - 17.17456
 
             quaternion_ = tf.transformations.quaternion_from_euler(0, 0, angle)
 
@@ -161,7 +166,9 @@ class cource_following_learning_node:
             self.pos.pose.pose.orientation.y = quaternion_[1]
             self.pos.pose.pose.orientation.z = quaternion_[2]
             self.pos.pose.pose.orientation.w = quaternion_[3]
-            self.pos.pose.covariance = [0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
+            self.pos.pose.covariance = [0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853891945200942]
+
+            # self.pos.pose.covariance = [0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
             
             # self.pos.pose.covariance = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06853892326654787]
 
@@ -223,6 +230,12 @@ class cource_following_learning_node:
                         self.simple_goal()
                         self.amcl_pose_pub.publish(self.pos)
 
+                    # if self.offset_ang == 5 and self.save_img_no % self.goal_rate == 1:
+                    #     self.capture_rate.sleep()
+        
+                    # if self.offset_ang == -5 and self.save_img_no % self.goal_rate == 2:
+                    #     self.capture_rate.sleep()
+
                     # if self.save_img_no % self.goal_rate == 0:
                     #     self.simple_goal()
                     #     self.amcl_pose_pub.publish(self.pos)
@@ -246,7 +259,6 @@ class cource_following_learning_node:
             self.r.sleep()
             self.r.sleep()
             self.r.sleep()
-        
 
     # def goal_pub(self):
     #     rospy.wait_for_service('/goal_pub')
@@ -262,7 +274,7 @@ class cource_following_learning_node:
         for i in range(len(self.pos_list)):
             x, y, theta = self.read_csv()
             self.robot_moving(x, y, theta)
-            # print("current_position:", x, y, theta)
+            print("current_position:", x, y, theta)
             self.save_img_no += 1
             self.capture_rate.sleep()
 

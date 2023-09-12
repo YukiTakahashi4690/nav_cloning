@@ -9,10 +9,10 @@ import sys
 class target_path:
     def __init__(self):
         rospy.init_node('target_path', anonymous=True)
-        self.image = cv2.imread(roslib.packages.get_pkg_dir('nav_cloning')+'/maps/willowgarage-refined.pgm')
+        self.image = cv2.imread(roslib.packages.get_pkg_dir('nav_cloning')+'/maps/willowgarage.pgm')
         self.image_resize = cv2.resize(self.image, (600, 600))
-        self.file_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/analysis/traceable_pos.csv'
-        self.save_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/draw_maps,pgm"
+        self.file_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/path/path_willow_shirasu.csv'
+        self.save_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/pos_test,pgm"
         self.image_name = ""
         self.path_x = []
         self.path_y = []

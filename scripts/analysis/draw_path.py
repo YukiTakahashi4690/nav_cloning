@@ -11,9 +11,9 @@ class target_path:
         rospy.init_node('target_path', anonymous=True)
         self.image = cv2.imread(roslib.packages.get_pkg_dir('nav_cloning')+'/maps/willowgarage.pgm')
         self.image_resize = cv2.resize(self.image, (600, 600))
-        self.file_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/path/path_willow_shirasu.csv'
+        self.file_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/path/willow_trajectory.csv'
         self.save_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/draw_maps/"
-        self.image_name = "path_willow_shirasu"
+        self.image_name = "willow_trajectory"
         self.path_x = []
         self.path_y = []
         self.pos_x = 0
@@ -52,8 +52,10 @@ class target_path:
             cv2.line(self.image_resize, (self.vis_x, self.vis_y), (self.old_vis_x, self.old_vis_y), (0, 0, 255), thickness=3)
 
     def loop(self):
-        self.pos_x = float(self.path_x[self.count]) - 11.252
-        self.pos_y = float(self.path_y[self.count]) - 16.70
+        # self.pos_x = float(self.path_x[self.count]) - 11.252
+        # self.pos_y = float(self.path_y[self.count]) - 16.70
+        self.pos_x = float(self.path_x[self.count]) - 10.71378
+        self.pos_y = float(self.path_y[self.count]) - 17.17456
         # print("pos_x", self.pos_x)
         self.draw_circle_line(self.pos_x, self.pos_y, self.old_pos_x, self.old_pos_y, self.count)
         self.crop_img = self.image_resize.copy()

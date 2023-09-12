@@ -9,7 +9,7 @@ with open(path, 'r') as csvfile:
             pos_list.append(row)
 
 def calc_avg():
-    no = 0
+    no = 11
     while no < len(pos_list):  
         cur_pos = pos_list[no]
         pos = cur_pos.split(',')

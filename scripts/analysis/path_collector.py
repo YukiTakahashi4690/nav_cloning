@@ -17,11 +17,11 @@ class path_collector_node:
         self.path_no = 0
         self.vel_sub = rospy.Subscriber("/nav_vel", Twist, self.callback_vel)
         self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/path/'
+        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/path/'
         self.vel_angular = 0
         self.vel = Twist()
         os.makedirs(self.path)
-        with open(self.path +  'path.csv', 'w') as f:
+        with open(self.path +  'test.csv', 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
             writer.writerow(['path_no', 'x(m)','y(m)'])
         self.pose_sub = rospy.Subscriber("/tracker", Odometry, self.callback_pose)
