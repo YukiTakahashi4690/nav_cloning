@@ -1,7 +1,9 @@
 import csv
 import math
 
-path = '/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/rm/straight/ang.csv'
+# path = '/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/offset_ang/straight/ang.csv'
+# path = '/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/offset_ang/620_666/ang.csv'
+path = '/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/offset_ang/1636_1670/ang.csv'
 pos_list = []
 
 with open(path, 'r') as csvfile:
@@ -9,14 +11,14 @@ with open(path, 'r') as csvfile:
             pos_list.append(row)
 
 def calc_avg():
-    no = 11
+    no = 8
     while no < len(pos_list):  
         cur_pos = pos_list[no]
         pos = cur_pos.split(',')
         print(pos)
         value = float(pos[1])
         value = [value]
-        no += 15
+        no += 9
         average = sum(value) / len(value)
     print(f"平均値: {average}")
 

@@ -47,9 +47,12 @@ class cource_following_learning_node:
         self.episode = 0
         self.vel = Twist()
         self.path_pose = PoseArray()
-        self.cv_image = np.zeros((480,689,3), np.uint8)
-        self.cv_left_image = np.zeros((480,689,3), np.uint8)
-        self.cv_right_image = np.zeros((480,689,3), np.uint8)
+        self.cv_image = np.zeros((480,694,3), np.uint8)
+        self.cv_left_image = np.zeros((480,694,3), np.uint8)
+        self.cv_right_image = np.zeros((480,694,3), np.uint8)
+        # self.cv_image = np.zeros((480,689,3), np.uint8)
+        # self.cv_left_image = np.zeros((480,689,3), np.uint8)
+        # self.cv_right_image = np.zeros((480,689,3), np.uint8)
         self.learning = True
         self.select_dl = False
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
@@ -192,17 +195,26 @@ class cource_following_learning_node:
     def loop(self):
         self.check_distance()
         if self.flag:
+            # self.crop_left_left_img = self.cv_left_image[0:480, 0:640]
+            # self.crop_left_center_img = self.cv_left_image[0:480, 25:665]
+            # self.crop_left_right_img = self.cv_left_image[0:480, 50:690]
             self.crop_left_left_img = self.cv_left_image[0:480, 0:640]
-            self.crop_left_center_img = self.cv_left_image[0:480, 25:665]
-            self.crop_left_right_img = self.cv_left_image[0:480, 50:690]
+            self.crop_left_center_img = self.cv_left_image[0:480, 27:667]
+            self.crop_left_right_img = self.cv_left_image[0:480, 54:694]
 
+            # self.crop_left_img = self.cv_image[0:480, 0:640]
+            # self.crop_img = self.cv_image[0:480, 25:665]
+            # self.crop_right_img = self.cv_image[0:480, 50:690]
             self.crop_left_img = self.cv_image[0:480, 0:640]
-            self.crop_img = self.cv_image[0:480, 25:665]
-            self.crop_right_img = self.cv_image[0:480, 50:690]
+            self.crop_img = self.cv_image[0:480, 27:667]
+            self.crop_right_img = self.cv_image[0:480, 54:694]
 
+            # self.crop_right_left_img = self.cv_right_image[0:480, 0:640]
+            # self.crop_right_center_img = self.cv_right_image[0:480, 25:665]
+            # self.crop_right_right_img = self.cv_right_image[0:480, 50:690]
             self.crop_right_left_img = self.cv_right_image[0:480, 0:640]
-            self.crop_right_center_img = self.cv_right_image[0:480, 25:665]
-            self.crop_right_right_img = self.cv_right_image[0:480, 50:690]
+            self.crop_right_center_img = self.cv_right_image[0:480, 27:667]
+            self.crop_right_right_img = self.cv_right_image[0:480, 54:694]
 
             self.resize_left_left_img = cv2.resize(self.crop_left_left_img, dsize=(64, 48))
             self.resize_left_center_img = cv2.resize(self.crop_left_center_img, dsize=(64, 48))

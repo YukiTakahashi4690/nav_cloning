@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="script" default="nav_cloning_test_mode.py"/>
+  <!-- <arg name="script" default="nav_cloning_collect.py"/> -->
+  <arg name="script" default="nav_collect_data.py"/>
   <!-- <arg name="mode" default="use_dl_output"/> -->
   <!-- <arg name="mode" default="follow_line"/> -->
   <arg name="num" default="1"/>
@@ -36,7 +37,7 @@
     <!-- <arg name="world_name" value="$(find nav_cloning)/world/Tsudanuma_2-3.world"/>  -->
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
-    <arg name="gui" value="false"/>
+    <arg name="gui" value="true"/>
     <arg name="headless" value="false"/>
     <arg name="debug" value="false"/>
   </include>

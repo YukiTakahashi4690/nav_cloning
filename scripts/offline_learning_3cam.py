@@ -14,7 +14,7 @@ class cource_following_learning_node:
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
         # os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time)
         self.model_num = str(sys.argv[1])
-        self.pro = "690_480"
+        self.pro = "694_480"
         self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.model_num)+".pt")
         # self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/01/model"+str(self.model_num)+".pt")
         self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/"+str(self.pro)+"/")
@@ -22,9 +22,8 @@ class cource_following_learning_node:
         self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/img/"+str(self.pro)+"/center")
         self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/img/"+str(self.pro)+"/left")
         self.learn_no = 4000
-        self.pos_no = 0
         self.count = 0
-        self.data = 570
+        self.data = 562
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro), exist_ok=True)
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/"+str(self.pro)+"/", exist_ok=True)
         
@@ -125,7 +124,7 @@ class cource_following_learning_node:
             self.dl.make_dataset(imgobj_left, target_ang - 0.2)
             """
 
-            if 206 <= k <= 221:
+            if 197 <= k <= 230:
                 self.dl.make_dataset(img_left_left, target_ang -0.024606637656689 + random.uniform(-0.01, 0.01))
                 self.dl.make_dataset(img_left_center, target_ang -0.024606637656689 + random.uniform(-0.01, 0.01))
                 self.dl.make_dataset(img_left_right, target_ang -0.05744856223464 + random.uniform(-0.01, 0.01))
@@ -139,7 +138,7 @@ class cource_following_learning_node:
                 self.dl.make_dataset(img_right_right, target_ang - 0.188733771443367 + random.uniform(-0.01, 0.01))
                 print("dataset:" + str(k))
 
-            elif 548 <= k <= 554:
+            elif 534 <= k <= 549:
                 self.dl.make_dataset(img_left_left, target_ang -0.237357228994369 + random.uniform(-0.01, 0.01))
                 self.dl.make_dataset(img_left_center, target_ang -0.172302231192589 + random.uniform(-0.01, 0.01))
                 self.dl.make_dataset(img_left_right, target_ang -0.155905798077583 + random.uniform(-0.01, 0.01))
@@ -168,17 +167,30 @@ class cource_following_learning_node:
             # else:
 
             else:
-                self.dl.make_dataset(img_left_left, target_ang -0.319439560174942 + random.uniform(-0.01, 0.01))
-                self.dl.make_dataset(img_left_center, target_ang -0.320055991411209 + random.uniform(-0.01, 0.01))
-                self.dl.make_dataset(img_left_right, target_ang -0.237954437732696 + random.uniform(-0.01, 0.01))
+                # self.dl.make_dataset(img_left_left, target_ang -0.319439560174942 + random.uniform(-0.01, 0.01))
+                # self.dl.make_dataset(img_left_center, target_ang -0.320055991411209 + random.uniform(-0.01, 0.01))
+                # self.dl.make_dataset(img_left_right, target_ang -0.237954437732696 + random.uniform(-0.01, 0.01))
 
-                self.dl.make_dataset(img_left, target_ang -0.024055354297161 + random.uniform(-0.01, 0.01))
+                # self.dl.make_dataset(img_left, target_ang -0.024055354297161 + random.uniform(-0.01, 0.01))
+                # self.dl.make_dataset(img, target_ang)
+                # self.dl.make_dataset(img_right, target_ang + 0.041019905358553 + random.uniform(-0.01, 0.01))
+
+                # self.dl.make_dataset(img_right_left, target_ang + 0.287183165550232 + random.uniform(-0.01, 0.01))
+                # self.dl.make_dataset(img_right_center, target_ang + 0.254361897706985 + random.uniform(-0.01, 0.01))
+                # self.dl.make_dataset(img_right_right, target_ang + 0.303595423698425 + random.uniform(-0.01, 0.01))
+
+                self.dl.make_dataset(img_left_left, target_ang -0.3 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_left_center, target_ang -0.25 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_left_right, target_ang -0.23 + random.uniform(-0.01, 0.01))
+
+                self.dl.make_dataset(img_left, target_ang -0.02 + random.uniform(-0.01, 0.01))
                 self.dl.make_dataset(img, target_ang)
-                self.dl.make_dataset(img_right, target_ang + 0.041019905358553 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right, target_ang + 0.02 + random.uniform(-0.01, 0.01))
 
-                self.dl.make_dataset(img_right_left, target_ang + 0.287183165550232 + random.uniform(-0.01, 0.01))
-                self.dl.make_dataset(img_right_center, target_ang + 0.254361897706985 + random.uniform(-0.01, 0.01))
-                self.dl.make_dataset(img_right_right, target_ang + 0.303595423698425 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right_left, target_ang + 0.23 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right_center, target_ang + 0.25 + random.uniform(-0.01, 0.01))
+                self.dl.make_dataset(img_right_right, target_ang + 0.3 + random.uniform(-0.01, 0.01))
+
                 print("dataset:" + str(k))
 
             # self.dl.make_dataset(img_left_left, target_ang -0.25)
@@ -193,10 +205,7 @@ class cource_following_learning_node:
             # self.dl.make_dataset(img_right_center, target_ang + 0.2)
             # self.dl.make_dataset(img_right_right, target_ang + 0.2)
             # print("dataset:" + str(k))
-            
-        # joblib.dump((self.dataset_right, self.dataset_center, self.dataset_left), open('/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/dataset/dataset.pkl', 'wb'), compress=6)
 
-        # self.dataset_right, self.dataset_center, self.dataset_left =joblib.load(open('/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/dataset/dataset.pkl', 'rb'))
         for l in range(self.learn_no):
             loss = self.dl.trains(self.count)
             print("train" + str(l))

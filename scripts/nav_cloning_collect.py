@@ -78,7 +78,7 @@ class cource_following_learning_node:
         self.dl = deep_learning(n_action=1)
         
 
-        with open(self.csv_path + '00_02_fix.csv', 'r') as fs:
+        with open(self.csv_path + '00_01_fix.csv', 'r') as fs:
         # with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
@@ -175,7 +175,8 @@ class cource_following_learning_node:
             # self.amcl_pose_pub.publish(self.pos)
             
             #gazebo
-            for self.offset_ang in [-5, 0, 5]:
+            for self.offset_ang in [-30, 0, 30]:
+            # for self.offset_ang in [-5, 0, 5]:
             # for self.offset_ang in [0]:
                 the = angle + math.radians(self.offset_ang)
                 the = the - 2.0 * math.pi if the >  math.pi else the
@@ -188,14 +189,23 @@ class cource_following_learning_node:
                 self.state.pose.orientation.z = quaternion[2]
                 self.state.pose.orientation.w = quaternion[3]
 
-                if self.offset_ang == -5:
-                    self.ang_no = "-5"
+                if self.offset_ang == -30:
+                    self.ang_no = "-30"
 
                 if self.offset_ang == 0:
                     self.ang_no = "0"
 
-                if self.offset_ang == +5:
-                    self.ang_no = "+5"
+                if self.offset_ang == +30:
+                    self.ang_no = "+30"
+
+                # if self.offset_ang == -5:
+                #     self.ang_no = "-5"
+
+                # if self.offset_ang == 0:
+                #     self.ang_no = "0"
+
+                # if self.offset_ang == +5:
+                #     self.ang_no = "+5"
 
                 try:
                     set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
