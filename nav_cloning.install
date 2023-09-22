@@ -9,11 +9,11 @@
 - git:
     uri: https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
     local-name: turtlebot3_msgs
-    version: melodic-devel
+    version: noetic-devel
 - git:
     uri: https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
     local-name: turtlebot3_simulations
-    version: melodic-devel
+    version: noetic-devel
 - git:
     uri: https://github.com/ROBOTIS-GIT/turtlebot3_gazebo_plugin.git
     local-name: turtlebot3_gazebo_plugin
@@ -25,7 +25,7 @@
 - git:
     uri: https://github.com/ros-planning/navigation.git
     local-name: navigation
-    version: melodic-devel
+    version: noetic-devel
 - git:
     uri: https://github.com/open-rdc/waypoint_nav
     local-name: waypoint_nav
