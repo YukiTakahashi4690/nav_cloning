@@ -87,18 +87,18 @@ class cource_following_learning_node:
     def capture_img(self):
             Flag = True
             try:
-                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_left_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_left_img)
                 cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_left_center_img)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_right_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_left_right_img)
 
-                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_img)
                 cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_img)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_right_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_img)
 
-                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_right_left_img)
                 cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_right_center_img)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_right_right_img)
-  
+                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_right_img)
+
             except:
                 print('Not save image')
                 Flag = False
@@ -195,17 +195,17 @@ class cource_following_learning_node:
         target_action = self.action
         distance = self.min_distance
         if self.flag:
-            self.crop_left_left_img = self.cv_left_image[0:480, 0:640]
-            self.crop_left_center_img = self.cv_left_image[0:480, 25:665]
-            self.crop_left_right_img = self.cv_left_image[0:480, 50:690]
+            self.crop_left_left_img = self.cv_left_image[20:500, 0:640]
+            self.crop_left_center_img = self.cv_left_image[20:500, 27:667]
+            self.crop_left_right_img = self.cv_left_image[20:500, 54:694]
 
-            self.crop_left_img = self.cv_image[0:480, 0:640]
-            self.crop_img = self.cv_image[0:480, 25:665]
-            self.crop_right_img = self.cv_image[0:480, 50:690]
+            self.crop_left_img = self.cv_image[20:500, 0:640]
+            self.crop_img = self.cv_image[20:500, 27:667]
+            self.crop_right_img = self.cv_image[20:500, 54:694]
 
-            self.crop_right_left_img = self.cv_right_image[0:480, 0:640]
-            self.crop_right_center_img = self.cv_right_image[0:480, 25:665]
-            self.crop_right_right_img = self.cv_right_image[0:480, 50:69]
+            self.crop_right_left_img = self.cv_right_image[20:500, 0:640]
+            self.crop_right_center_img = self.cv_right_image[20:500, 27:667]
+            self.crop_right_right_img = self.cv_right_image[20:500, 54:694]
 
             self.resize_left_left_img = cv2.resize(self.crop_left_left_img, dsize=(64, 48))
             self.resize_left_center_img = cv2.resize(self.crop_left_center_img, dsize=(64, 48))
