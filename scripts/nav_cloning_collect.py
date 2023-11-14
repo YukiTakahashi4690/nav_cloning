@@ -54,6 +54,9 @@ class cource_following_learning_node:
         self.collect_data_srv = rospy.Service('/collect_data', Trigger, self.collect_data)
         # self.goal_pub_srv = rospy.Service('/goal_pub', Trigger, self.goal_pub)
         self.save_img_no = 0
+        # self.save_img_center_no = 0
+        # self.save_img_left_no = -1
+        # self.save_img_right_no = -1 
         self.goal_rate = 3
         self.goal_no = 24
         self.offset_ang = 0      
@@ -78,15 +81,21 @@ class cource_following_learning_node:
         self.dl = deep_learning(n_action=1)
         
 
-        with open(self.csv_path + '00_01_fix.csv', 'r') as fs:
+        with open(self.csv_path + '00_02_fix.csv', 'r') as fs:
         # with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
 
     def capture_img(self):
             Flag = True
-            try:
+            try:  
                 cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_resized)
+                # if self.save_img_no % self.goal_rate == 0:
+                    #  cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_center_no) + "_" + self.ang_no + ".jpg", self.im_resized)
+                # elif self.save_img_no % self.goal_rate == 1:
+                    # cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_left_no) + "_" + self.ang_no + ".jpg", self.im_resized)
+                # elif self.save_img_no % self.goal_rate == 2:
+                    # cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_right_no) + "_" + self.ang_no + ".jpg", self.im_resized)
                 # cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_right_resized)
                 # cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_left_resized)
             except:
@@ -95,6 +104,9 @@ class cource_following_learning_node:
             finally:
                 if Flag:
                     print('Save image Number:', self.save_img_no)
+                    print('Center Number:', self.save_img_center_no)
+                    print('Right Number:', self.save_img_right_no)
+                    print('Left Number:', self.save_img_left_no)
 
     def capture_ang(self):
             line = [str(self.save_img_no), str(self.action)]
@@ -175,8 +187,7 @@ class cource_following_learning_node:
             # self.amcl_pose_pub.publish(self.pos)
             
             #gazebo
-            for self.offset_ang in [-30, 0, 30]:
-            # for self.offset_ang in [-5, 0, 5]:
+            for self.offset_ang in [-5, 0, 5]:
             # for self.offset_ang in [0]:
                 the = angle + math.radians(self.offset_ang)
                 the = the - 2.0 * math.pi if the >  math.pi else the
@@ -189,23 +200,14 @@ class cource_following_learning_node:
                 self.state.pose.orientation.z = quaternion[2]
                 self.state.pose.orientation.w = quaternion[3]
 
-                if self.offset_ang == -30:
-                    self.ang_no = "-30"
-
+                if self.offset_ang == -5:
+                    self.ang_no = "-5"
+# 
                 if self.offset_ang == 0:
                     self.ang_no = "0"
-
-                if self.offset_ang == +30:
-                    self.ang_no = "+30"
-
-                # if self.offset_ang == -5:
-                #     self.ang_no = "-5"
-
-                # if self.offset_ang == 0:
-                #     self.ang_no = "0"
-
-                # if self.offset_ang == +5:
-                #     self.ang_no = "+5"
+# 
+                if self.offset_ang == +5:
+                    self.ang_no = "+5"
 
                 try:
                     set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
@@ -286,6 +288,12 @@ class cource_following_learning_node:
             self.robot_moving(x, y, theta)
             print("current_position:", x, y, theta)
             self.save_img_no += 1
+            # if self.save_img_no % self.goal_rate == 0:
+                # self.save_img_center_no += 1
+            # elif self.save_img_no % self.goal_rate == 1:
+                # self.save_img_left_no += 1
+            # elif self.save_img_no % self.goal_rate == 2:
+                # self.save_img_right_no += 1
             self.capture_rate.sleep()
 
             if i == len(self.pos_list):

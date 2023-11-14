@@ -61,6 +61,9 @@ class cource_following_learning_node:
         self.previous_reset_time = 0
         self.start_time_s = rospy.get_time()
         self.save_img_no = 0
+        self.save_img_left_no = 1
+        self.save_img_center_no = 0
+        self.save_img_right_no = -1
         self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/'
         self.pose_x = 0
         self.pose_y = 0
@@ -89,17 +92,29 @@ class cource_following_learning_node:
     def capture_img(self):
             Flag = True
             try:
-                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_left_img)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_left_center_img)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_left_right_img)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_left_img)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_left_center_img)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_left_right_img)
 
-                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_img)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_img)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_img)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_img)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_img)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_img)
 
-                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_right_left_img)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_right_center_img)
-                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_right_img)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_right_left_img)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_right_center_img)
+                # cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_right_img)
+
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_left_no) + "_" + "+5" + ".jpg", self.resize_left_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_left_no) + "_" + "0" + ".jpg", self.resize_left_center_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_left_no) + "_" + "-5" + ".jpg", self.resize_left_right_img)
+
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_center_no) + "_" + "+5" + ".jpg", self.resize_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_center_no) + "_" + "0" + ".jpg", self.resize_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_center_no) + "_" + "-5" + ".jpg", self.resize_right_img)
+
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_right_no) + "_" + "+5" + ".jpg", self.resize_right_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_right_no) + "_" + "0" + ".jpg", self.resize_right_center_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_right_no) + "_" + "-5" + ".jpg", self.resize_right_right_img)
   
             except:
                 print('Not save image')
@@ -231,6 +246,9 @@ class cource_following_learning_node:
             self.capture_img()
             self.capture_ang()
             self.save_img_no += 1
+            self.save_img_left_no += 3
+            self.save_img_center_no += 3
+            self.save_img_right_no += 3
             self.flag = False
         
         if self.cv_image.size != 640 * 480 * 3:
