@@ -60,7 +60,7 @@ class nav_cloning_node:
         self.learning = False
         self.select_dl = False
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
-        self.pro = "mazemaze_v3"
+        self.pro = "9cam"
         # self.load_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model1.pt"
         self.load_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.num)+".pt"
         self.score = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/score/"+str(self.pro)+".csv"
