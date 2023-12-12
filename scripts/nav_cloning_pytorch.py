@@ -71,7 +71,7 @@ class deep_learning:
     def __init__(self, n_channel=3, n_action=1):
         #<tensor device choiece>
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        # self.device = torch.device('cpu' if torch.cuda.is_available() else 'cuda')
+        # self.device = torch.device('cpu')
         self.net = Net(n_channel, n_action)
         self.net.to(self.device)
         print(self.device)
@@ -173,6 +173,8 @@ class deep_learning:
     def load(self, load_path):
         #<model load>
         self.net.load_state_dict(torch.load(load_path))
+        #<only cpu>
+        # self.net.load_state_dict(torch.load(load_path, map_location=torch.device('cpu')))
 
 if __name__ == '__main__':
         dl = deep_learning()
