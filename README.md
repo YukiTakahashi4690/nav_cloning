@@ -10,7 +10,7 @@ nav_cloning nav_cloning_sim.launch script:=nav_cloning_collect.py use_waypoint_n
 ```
 - オフライン学習
     - シェル内で呼び出しているスクリプト内のself.proを使用するデータフォルダ名に変更する
-    - ※angフォルダ名とimgフォルダ名は同一名にする
+    - **angフォルダ名とimgフォルダ名は同一名にする**
 ```
 roscd nav_cloning/sh
 ./learning.sh
