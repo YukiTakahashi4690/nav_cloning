@@ -2,7 +2,7 @@ import csv
 
 class maka_csv_node:
         def __init__(self):
-            self.path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/00_02/ang.csv"
+            self.path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/test2/ang.csv"
             self.write_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/analysis/-02m_5deg.csv"
             self.pos_list = []
             with open(self.path, "r") as csvfile:

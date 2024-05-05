@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <launch>
-
+  <arg name="script" default="nav_cloning_node.py"/>
   <!-- <arg name="script" default="nav_cloning_collect.py"/> -->
   <!-- <arg name="script" default="nav_collect_data.py"/> -->
-  <arg name="script" default="nav_collect_data_9cam.py"/>
-  <!-- <arg name="mode" default="use_dl_output"/> -->
+  <!-- <arg name="script" default="nav_collect_data_9cam.py"/> -->
+  <arg name="mode" default="use_dl_output"/>
   <!-- <arg name="mode" default="follow_line"/> -->
   <arg name="num" default="1"/>
   <arg name="world_name" default="willow_garage.world"/>
@@ -13,7 +13,9 @@
   <!-- <arg name="map_file" default="Tsudanuma_2-3.yaml"/> -->
   <arg name="waypoints_file" default="willow_loop_waypoint_nav_shirasu.yaml"/>
   <!-- <arg name="waypoints_file" default="Tsudanuma_2-3_loop.yaml"/> -->
+  <arg name="rate" default="0.1" />
   <arg name="dist_err" default="0.8"/>
+  <!-- <arg name="dist_err" default="0.8"/> -->
   <arg name="initial_pose_x" default="-9.20645" />
   <arg name="initial_pose_y" default="-16.42460" />
   <!-- <arg name="initial_pose_x" default="-9.5" /> -->
@@ -54,7 +56,7 @@
         name="timed_roslaunch" output="screen" />
 
   <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
-        args="8 nav_cloning turtlebot3_navigation.launch model:=waffle map_file:=$(find nav_cloning)/maps/$(arg map_file) waypoints_file:=$(find nav_cloning)/waypoint/$(arg waypoints_file) dist_err:=$(arg dist_err) initial_pose_x:=$(arg initial_pose_x) initial_pose_y:=$(arg initial_pose_y) initial_pose_a:=$(arg initial_pose_a) use_waypoint_nav:=$(arg use_waypoint_nav)"
+        args="8 nav_cloning turtlebot3_navigation.launch model:=waffle map_file:=$(find nav_cloning)/maps/$(arg map_file) waypoints_file:=$(find nav_cloning)/waypoint/$(arg waypoints_file) rate:=$(arg rate) dist_err:=$(arg dist_err) initial_pose_x:=$(arg initial_pose_x) initial_pose_y:=$(arg initial_pose_y) initial_pose_a:=$(arg initial_pose_a) use_waypoint_nav:=$(arg use_waypoint_nav)"
         name="timed_roslaunch2" >
   </node>
 

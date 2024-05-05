@@ -47,7 +47,6 @@ class cource_following_learning_node:
         self.vel_sub = rospy.Subscriber("/cmd_vel", Twist, self.callback_vel, queue_size=10)
         self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
         # self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-        self.srv = rospy.Service('/training', SetBool, self.callback_dl_training)
         self.pose_sub = rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, self.callback_pose)
         self.path_sub = rospy.Subscriber("/move_base/NavfnROS/plan", Path, self.callback_path)
         self.min_distance = 0.0
@@ -91,19 +90,6 @@ class cource_following_learning_node:
         os.makedirs(self.path + "img/" + self.start_time)
         os.makedirs(self.path + "ang/" + self.start_time)
         self.pose_sub = rospy.Subscriber("/tracker", Odometry, self.callback_odom_pose)
-
-        # self.write_flag = True
-        # self.odom_sub = rospy.Subscriber("/tracker", Odometry, self.path_write)
-        # self.path_pose_x = 0
-        # self.path_pose_y = 0
-        # self.path_no = 0
-        # with open(self.path +  'analysis/path/tsudanuma_2-3.csv', 'w') as f:
-        #     writer = csv.writer(f, lineterminator='\n')
-        #     writer.writerow(['path_no', 'x(m)','y(m)'])
-
-        # with open(self.path + self.start_time + '/' +  'reward.csv', 'w') as f:
-        #     writer = csv.writer(f, lineterminator='\n')
-        #     writer.writerow(['step', 'mode', 'loss', 'angle_error(rad)', 'distance(m)'])
 
     def capture_img(self):
             Flag = True
@@ -199,28 +185,6 @@ class cource_following_learning_node:
         except CvBridgeError as e:
             print(e)
 
-    # def path_write(self, data):
-    #         with open(self.path + 'analysis/path/tsudanuma_2-3.csv', 'a') as f:
-    #             self.path_pose_x = data.pose.pose.position.x
-    #             self.path_pose_y = data.pose.pose.position.y
-    #             path_line = [str(self.path_no), str(self.path_pose_x), str(self.path_pose_y)]
-    #             writer = csv.writer(f, lineterminator='\n')
-    #             writer.writerow(path_line)
-    #         self.path_no += 1
-
-    #ロボットの座標
-    # def path_write(self, data):
-    #     if self.write_flag:
-    #         a = len(data.poses)
-    #         with open(self.path + 'analysis/path/path1.csv', 'a') as f:
-    #             for i in range(a):
-    #                 self.path_pose_x = data.poses[i].pose.position.x
-    #                 self.path_pose_y = data.poses[i].pose.position.y
-    #                 path_line = [str(self.path_pose_x), str(self.path_pose_y)]
-    #                 writer = csv.writer(f, lineterminator='\n')
-    #                 writer.writerow(path_line)
-    #     self.write_flag = False
-
     def callback_path(self, data):
         self.path_pose = data
 
@@ -252,36 +216,9 @@ class cource_following_learning_node:
         self.vel = data
         self.action = self.vel.angular.z
 
-    def callback_dl_training(self, data):
-        resp = SetBoolResponse()
-        self.learning = data.data
-        resp.message = "Training: " + str(self.learning)
-        resp.success = True
-        return resp
-
     def loop(self):
         self.check_distance()
         if self.flag:
-            # # self.crop_left_left_img = self.cv_left_image[0:480, 0:640]
-            # # self.crop_left_center_img = self.cv_left_image[0:480, 25:665]
-            # # self.crop_left_right_img = self.cv_left_image[0:480, 50:690]
-            # self.crop_left_left_img = self.cv_left_image[20:500, 0:640]
-            # self.crop_left_center_img = self.cv_left_image[20:500, 27:667]
-            # self.crop_left_right_img = self.cv_left_image[20:500, 54:694]
-
-            # # self.crop_left_img = self.cv_image[0:480, 0:640]
-            # # self.crop_img = self.cv_image[0:480, 25:665]
-            # # self.crop_right_img = self.cv_image[0:480, 50:690]
-            # self.crop_left_img = self.cv_image[20:500, 0:640]
-            # self.crop_img = self.cv_image[20:500, 27:667]
-            # self.crop_right_img = self.cv_image[20:500, 54:694]
-
-            # # self.crop_right_left_img = self.cv_right_image[0:480, 0:640]
-            # # self.crop_right_center_img = self.cv_right_image[0:480, 25:665]
-            # # self.crop_right_right_img = self.cv_right_image[0:480, 50:690]
-            # self.crop_right_left_img = self.cv_right_image[20:500, 0:640]
-            # self.crop_right_center_img = self.cv_right_image[20:500, 27:667]
-            # self.crop_right_right_img = self.cv_right_image[20:500, 54:694]
 
             self.resize_left_left_img = cv2.resize(self.cv_left_left_image, dsize=(64, 48))
             self.resize_left_center_img = cv2.resize(self.cv_left_image, dsize=(64, 48))
@@ -309,44 +246,12 @@ class cource_following_learning_node:
             return
         if self.cv_right_image.size != 640 * 480 * 3:
             return
-        """
-        rospy.wait_for_service('/gazebo/get_model_state')
-        get_model_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-        try:
-            previous_model_state = get_model_state('mobile_base', 'world')
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
-        """
         
         if self.vel.linear.x == 0:
             return
 
-        # img = resize(self.cv_image, (48, 64), mode='constant')
-        # r, g, b = cv2.split(img)
-        # imgobj = np.asanyarray([r,g,b])
-
-        # img_left = resize(self.cv_left_image, (48, 64), mode='constant')
-        # r, g, b = cv2.split(img_left)
-        # imgobj_left = np.asanyarray([r,g,b])
-
-        # img_right = resize(self.cv_right_image, (48, 64), mode='constant')
-        # r, g, b = cv2.split(img_right)
-        # imgobj_right = np.asanyarray([r,g,b])
-
-        # ros_time = str(rospy.Time.now())
-
         if self.episode == 4000:
             self.learning = False
-            #self.dl.save(self.save_path)
-            #self.dl.load(self.load_path)
-
-        # temp = copy.deepcopy(img)
-        # cv2.imshow("Resized Image", temp)
-        # temp = copy.deepcopy(img_left)
-        # cv2.imshow("Resized Left Image", temp)
-        # temp = copy.deepcopy(img_right)
-        # cv2.imshow("Resized Right Image", temp)
-        # cv2.waitKey(1)
 
 if __name__ == '__main__':
     rg = cource_following_learning_node()

@@ -3,7 +3,7 @@
     local-name: timed_roslaunch
     version: melodic-devel
 - git:
-    uri: https://github.com/open-rdc/turtlebot3
+    uri: https://github.com/YukiTakahashi4690/turtlebot3.git
     local-name: turtlebot3
     version: 3_cameras
 - git:
@@ -23,10 +23,10 @@
     local-name: nav_cloning
     version: master
 - git:
-    uri: https://github.com/ros-planning/navigation.git
+    uri: https://github.com/YukiTakahashi4690/navigation.git
     local-name: navigation
     version: noetic-devel
 - git:
-    uri: https://github.com/open-rdc/waypoint_nav
+    uri: https://github.com/YukiTakahashi4690/waypoint_nav.git
     local-name: waypoint_nav
     version: main

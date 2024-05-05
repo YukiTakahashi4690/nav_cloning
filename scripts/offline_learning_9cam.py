@@ -53,17 +53,17 @@ class cource_following_learning_node:
             # else:
                 # for j in ["0"]:
                 # for j in ["-5", "0", "+5"]:
-                    img_left_left = cv2.imread(self.img_left_path + str(self.left_nam) + "_" + "-5" + ".jpg")
+                    img_left_left = cv2.imread(self.img_left_path + str(self.left_nam) + "_" + "+5" + ".jpg")
                     img_left_center = cv2.imread(self.img_left_path + str(self.left_nam) + "_" + "0" + ".jpg")
-                    img_left_right = cv2.imread(self.img_left_path + str(self.left_nam) + "_" + "+5" + ".jpg")
+                    img_left_right = cv2.imread(self.img_left_path + str(self.left_nam) + "_" + "-5" + ".jpg")
 
-                    img_left = cv2.imread(self.img_path + str(self.center_nam) + "_" + "-5" + ".jpg")
+                    img_left = cv2.imread(self.img_path + str(self.center_nam) + "_" + "+5" + ".jpg")
                     img = cv2.imread(self.img_path + str(self.center_nam) + "_" + "0" + ".jpg")
-                    img_right = cv2.imread(self.img_path + str(self.center_nam) + "_" + "+5" + ".jpg")
+                    img_right = cv2.imread(self.img_path + str(self.center_nam) + "_" + "-5" + ".jpg")
 
-                    img_right_left = cv2.imread(self.img_right_path + str(self.right_nam) + "_" + "-5" + ".jpg")
+                    img_right_left = cv2.imread(self.img_right_path + str(self.right_nam) + "_" + "+5" + ".jpg")
                     img_right_center = cv2.imread(self.img_right_path + str(self.right_nam) + "_" + "0" + ".jpg")
-                    img_right_right = cv2.imread(self.img_right_path + str(self.right_nam) + "_" + "+5" + ".jpg")
+                    img_right_right = cv2.imread(self.img_right_path + str(self.right_nam) + "_" + "-5" + ".jpg")
                     
                     img_left_left_list.append(img_left_left)
                     img_left_center_list.append(img_left_center)
@@ -107,17 +107,17 @@ class cource_following_learning_node:
 
             target_ang = ang_list[k]
 
-            self.dl.make_dataset(img_left_left, target_ang -0.3)
-            self.dl.make_dataset(img_left_center, target_ang -0.25)
-            self.dl.make_dataset(img_left_right, target_ang -0.2)
+            self.dl.make_dataset(img_left_left, target_ang -0.244)
+            self.dl.make_dataset(img_left_center, target_ang -0.182)
+            self.dl.make_dataset(img_left_right, target_ang -0.057)
 
-            self.dl.make_dataset(img_left, target_ang -0.1)
+            self.dl.make_dataset(img_left, target_ang -0.0128)
             self.dl.make_dataset(img, target_ang)
-            self.dl.make_dataset(img_right, target_ang + 0.1)
+            self.dl.make_dataset(img_right, target_ang + 0.134)
 
-            self.dl.make_dataset(img_right_left, target_ang + 0.2)
-            self.dl.make_dataset(img_right_center, target_ang + 0.25)
-            self.dl.make_dataset(img_right_right, target_ang + 0.3)
+            self.dl.make_dataset(img_right_left, target_ang + 0.196)
+            self.dl.make_dataset(img_right_center, target_ang + 0.245)
+            self.dl.make_dataset(img_right_right, target_ang + 0.26)
 
             print("dataset:" + str(k))
 
