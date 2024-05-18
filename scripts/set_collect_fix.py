@@ -8,29 +8,24 @@ from geometry_msgs.msg import PoseWithCovarianceStamped,Twist
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from nav_cloning_net import *
-from skimage.transform import resize
 from geometry_msgs.msg import Twist
-from geometry_msgs.msg import PoseArray
-from std_msgs.msg import Int8
 from std_srvs.srv import Trigger
-from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseWithCovarianceStamped
-from std_srvs.srv import Empty
 from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Header
 
 from gazebo_msgs.srv import SetModelState
-from gazebo_msgs.srv import GetModelState
 from gazebo_msgs.msg import ModelState
 
 import math
-import tf
+import tf.transformations
 
 from std_srvs.srv import SetBool, SetBoolResponse
 import csv
 import os
 import time
-import copy
 import sys
+import datetime
 
 class cource_following_learning_node:
     def __init__(self):
@@ -38,7 +33,9 @@ class cource_following_learning_node:
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.callback)
         self.vel_sub = rospy.Subscriber("/nav_vel", Twist, self.callback_vel)
-        self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
+        # self.gazebo_state_sub = rospy.Subscriber("/gazebo/model_state", ModelState, self.callback_gazebo_pose, queue_size=1)
+        self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
+        self.simple_goal_pub = rospy.Publisher('move_base_simple/goal', PoseStamped, queue_size=10)
         # self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.min_distance = 0.0
         self.action = 0.0
@@ -65,12 +62,11 @@ class cource_following_learning_node:
         rospy.wait_for_service('/gazebo/set_model_state')
         self.state = ModelState()
         self.state.model_name = 'mobile_base'
-        self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
-        self.simple_goal_pub = rospy.Publisher('move_base_simple/goal', PoseStamped, queue_size=10)
         os.makedirs(self.path + "img/" + self.start_time)
         os.makedirs(self.path + "ang/" + self.start_time)
-        self.dl = deep_learning(n_action=1)
-        
+        self.yaw = 0
+        self.old_yaw = 0
+        self.state_flag = False
 
         with open(self.csv_path + '00_02_fix.csv', 'r') as fs:
         # with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
@@ -108,6 +104,31 @@ class cource_following_learning_node:
             theta = float(pos[3])
             # print('Moving_pose:', x, y, theta)
             return x, y, theta
+    
+    # def callback_gazebo_pose(self, data):
+    #      self.cur_orientation_x = data.pose.orientation.x
+    #      self.cur_orientation_y = data.pose.orientation.y
+    #      self.cur_orientation_z = data.pose.orientation.z
+    #      self.cur_orientation_w = data.pose.orientation.w
+
+    def check_state(self, x, y, z, w):
+         quaternion = (x, y, z, w)
+         euler = tf.transformations.euler_from_quaternion(quaternion)
+         self.yaw = euler[2]
+         print("Current Yaw: ", self.yaw)
+         dist_yaw = abs(self.yaw - self.old_yaw)
+         if abs(dist_yaw) > 0.01:
+              self.old_yaw = self.yaw
+            #   self.current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+              self.current_time = rospy.Time.now()
+              self.state_flag = True
+    #           self.capture_data()
+
+    # def capture_data(self):
+    #      if self.state_flag:
+    #             self.capture_img()
+    #             self.capture_ang()
+    #             self.state_flag = False
 
     def simple_goal(self):
         list_num = self.save_img_no + self.goal_no
@@ -166,6 +187,7 @@ class cource_following_learning_node:
                 self.state.pose.orientation.y = quaternion[1]
                 self.state.pose.orientation.z = quaternion[2]
                 self.state.pose.orientation.w = quaternion[3]
+                self.check_state(quaternion[0], quaternion[1], quaternion[2], quaternion[3])
 
                 if self.offset_ang == -5:
                     self.ang_no = "-5"
@@ -185,8 +207,11 @@ class cource_following_learning_node:
                         self.amcl_pose_pub.publish(self.pos)
                   
                     #test
-                    self.capture_img()
-                    self.capture_ang()
+                    if self.state_flag:
+                        self.capture_img()
+                        self.capture_ang()
+                        self.state_flag = False
+
 
                 except rospy.ServiceException as e:
                     print("Service call failed: %s" % e)
@@ -208,7 +233,7 @@ class cource_following_learning_node:
         for i in range(len(self.pos_list)):
             x, y, theta = self.read_csv()
             self.robot_moving(x, y, theta)
-            print("current_position:", x, y, theta)
+            # print("current_position:", x, y, theta)
             self.save_img_no += 1
             self.capture_rate.sleep()
 
@@ -229,7 +254,6 @@ class cource_following_learning_node:
 
 if __name__ == '__main__':
     rg = cource_following_learning_node()
-    rg.subscribe()
     DURATION = 0.2
     r = rospy.Rate(1 / DURATION)
     while not rospy.is_shutdown():

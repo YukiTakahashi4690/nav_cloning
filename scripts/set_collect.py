@@ -40,7 +40,8 @@ class cource_following_learning_node:
         # self.image_left_sub = rospy.Subscriber("/camera_left/rgb/image_raw", Image, self.callback_left_camera)
         # self.image_right_sub = rospy.Subscriber("/camera_right/rgb/image_raw", Image, self.callback_right_camera)
         self.vel_sub = rospy.Subscriber("/nav_vel", Twist, self.callback_vel)
-        self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
+        self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
+        self.simple_goal_pub = rospy.Publisher('move_base_simple/goal', PoseStamped, queue_size=10)
         # self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.min_distance = 0.0
         self.action = 0.0
@@ -67,11 +68,8 @@ class cource_following_learning_node:
         rospy.wait_for_service('/gazebo/set_model_state')
         self.state = ModelState()
         self.state.model_name = 'mobile_base'
-        self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
-        self.simple_goal_pub = rospy.Publisher('move_base_simple/goal', PoseStamped, queue_size=10)
         os.makedirs(self.path + "img/" + self.start_time)
         os.makedirs(self.path + "ang/" + self.start_time)
-        self.dl = deep_learning(n_action=1)
         
 
         with open(self.csv_path + '00_02_fix.csv', 'r') as fs:

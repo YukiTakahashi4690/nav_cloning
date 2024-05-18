@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="script" default="nav_cloning_node.py"/>
-  <!-- <arg name="script" default="nav_cloning_collect.py"/> -->
-  <!-- <arg name="script" default="nav_collect_data.py"/> -->
-  <!-- <arg name="script" default="nav_collect_data_9cam.py"/> -->
+  <!-- <arg name="script" default="set_collect.py"/> -->
+  <!-- <arg name="script" default="run_collect.py"/> -->
+  <!-- <arg name="script" default="run_collect_9cam.py"/> -->
   <arg name="mode" default="use_dl_output"/>
   <!-- <arg name="mode" default="follow_line"/> -->
   <arg name="num" default="1"/>
