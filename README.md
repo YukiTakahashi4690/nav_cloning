@@ -6,7 +6,7 @@
     - このように目標経路に対してロボットを配置する
     - データ収集後はangフォルダとimgフォルダ内にそれぞれ角速度と画像が保存される  
 ```
-nav_cloning nav_cloning_sim.launch script:=nav_cloning_collect.py use_waypoint_nav:=false
+nav_cloning nav_cloning_sim.launch script:=set_collect.py use_waypoint_nav:=false
 ```
 - オフライン学習
     - シェル内で呼び出しているスクリプト内のself.proを使用するデータフォルダ名に変更する
