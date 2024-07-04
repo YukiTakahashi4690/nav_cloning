@@ -37,9 +37,10 @@ class nav_cloning_node:
         self.action_num = 1
         self.dl = deep_learning(n_action = self.action_num)
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.callback)
-        self.image_left_sub = rospy.Subscriber("/camera_left/rgb/image_raw", Image, self.callback_left_camera)
-        self.image_right_sub = rospy.Subscriber("/camera_right/rgb/image_raw", Image, self.callback_right_camera)
+        self.image_sub = rospy.Subscriber("/image/mercator", Image, self.callback)
+        # self.image_sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.callback)
+        # self.image_left_sub = rospy.Subscriber("/camera_left/rgb/image_raw", Image, self.callback_left_camera)
+        # self.image_right_sub = rospy.Subscriber("/camera_right/rgb/image_raw", Image, self.callback_right_camera)
         self.vel_sub = rospy.Subscriber("/nav_vel", Twist, self.callback_vel)
         self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
         self.nav_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
@@ -53,14 +54,14 @@ class nav_cloning_node:
         self.episode = 0
         self.vel = Twist()
         self.path_pose = PoseArray()
-        self.cv_image = np.zeros((480,640,3), np.uint8)
-        self.cv_left_image = np.zeros((480,640,3), np.uint8)
-        self.cv_right_image = np.zeros((480,640,3), np.uint8)
+        self.cv_image = np.zeros((520,694,3), np.uint8)
+        # self.cv_left_image = np.zeros((520,694,3), np.uint8)
+        # self.cv_right_image = np.zeros((520,694,3), np.uint8)
         # self.learning = True
         self.learning = False
         self.select_dl = False
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
-        self.pro = "694_520_01hz"
+        self.pro = "omni_0614"
         # self.load_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model1.pt"
         self.load_path = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.num)+".pt"
         self.score = "/home/y-takahashi/catkin_ws/src/nav_cloning/data/score/"+str(self.pro)+".csv"
@@ -163,21 +164,23 @@ class nav_cloning_node:
         return collision_flag
 
     def loop(self):
-        if self.cv_image.size != 640 * 480 * 3:
+        if self.cv_image.size != 1280 * 640 * 3:
+        # if self.cv_image.size != 694 * 520 * 3:
             return
-        if self.cv_left_image.size != 640 * 480 * 3:
-            return
-        if self.cv_right_image.size != 640 * 480 * 3:
-            return
+        # if self.cv_left_image.size != 640 * 480 * 3:
+        #     return
+        # if self.cv_right_image.size != 640 * 480 * 3:
+        #     return
         if self.vel.linear.x != 0:
             self.is_started = True
         if self.is_started == False:
             return
-        img = resize(self.cv_image, (48, 64), mode='constant')
+        
+        crop_img = self.cv_image[80:560, 320:960]
 
-        img_left = resize(self.cv_left_image, (48, 64), mode='constant')
-
-        img_right = resize(self.cv_right_image, (48, 64), mode='constant')
+        img = resize(crop_img, (48, 64), mode='constant')
+        # img_left = resize(self.cv_left_image, (48, 64), mode='constant')
+        # img_right = resize(self.cv_right_image, (48, 64), mode='constant')
 
         ros_time = str(rospy.Time.now())
 

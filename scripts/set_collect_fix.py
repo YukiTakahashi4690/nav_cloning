@@ -7,7 +7,7 @@ import cv2
 from geometry_msgs.msg import PoseWithCovarianceStamped,Twist
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-from nav_cloning_net import *
+from nav_cloning_pytorch import *
 from geometry_msgs.msg import Twist
 from std_srvs.srv import Trigger
 from geometry_msgs.msg import PoseWithCovarianceStamped

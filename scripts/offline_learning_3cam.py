@@ -14,7 +14,7 @@ class cource_following_learning_node:
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
         # os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time)
         self.model_num = str(sys.argv[1])
-        self.pro = "694_520_01hz"
+        self.pro = "omni_0614"
         self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.model_num)+".pt")
         # self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/01/model"+str(self.model_num)+".pt")
         self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/ang/"+str(self.pro)+"/")
@@ -23,7 +23,7 @@ class cource_following_learning_node:
         self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/img/"+str(self.pro)+"/left")
         self.learn_no = 4000
         self.count = 0
-        self.data = 653
+        self.data = 432
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/model/"+str(self.pro), exist_ok=True)
         os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/"+str(self.pro)+"/", exist_ok=True)
         

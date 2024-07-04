@@ -45,16 +45,9 @@
   <include file="$(find turtlebot3_navigation)/launch/move_base.launch">
     <arg name="model" value="$(arg model)" />
     <arg name="move_forward_only" value="$(arg move_forward_only)"/>
-    <arg name="cmd_vel_topic" value="/cmd_vel"/>
-    <!-- <arg name="cmd_vel_topic" value="/nav_vel"/> -->
+    <!-- <arg name="cmd_vel_topic" value="/cmd_vel"/> -->
+    <arg name="cmd_vel_topic" value="/nav_vel"/>
   </include>
-  
-  <!-- <group unless="$(arg use_waypoint_nav)">
-    <node name="waypoints_nav" pkg="fulanghua_waypoints_nav" type="waypoints_nav" output="screen">
-      <param name="filename" value="$(arg waypoints_file)"/>
-      <param name="dist_err" value="$(arg dist_err)"/>
-    </node>
-  </group> -->
 
   <group if="$(arg use_waypoint_nav)">
     <!-- <node name="waypoint_nav" pkg="waypoint_nav" type="waypoint_navigator" output="screen"> -->
@@ -69,6 +62,6 @@
   <!-- rviz -->
   <group if="$(arg open_rviz)"> 
     <node pkg="rviz" type="rviz" name="rviz" required="true"
-          args="-d $(find turtlebot3_navigation)/rviz/turtlebot3_navigation.rviz"/>
+          args="-d $(find turtlebot3_navigation)/rviz/navigation.rviz"/>
   </group>
 </launch>

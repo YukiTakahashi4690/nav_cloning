@@ -6,7 +6,7 @@ import rospy
 import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-from nav_cloning_net import *
+from nav_cloning_pytorch import *
 from skimage.transform import resize
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PoseArray
@@ -21,6 +21,7 @@ from std_srvs.srv import Empty
 from std_srvs.srv import SetBool, SetBoolResponse
 import csv
 import os
+import sys
 import time
 import copy
 from nav_msgs.msg import Odometry
@@ -32,7 +33,9 @@ class cource_following_learning_node:
         self.action_num = rospy.get_param("/LiDAR_based_learning_node/action_num", 1)
         print("action_num: " + str(self.action_num))
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_raw_front", Image, self.callback)
+        self.image_sub = rospy.Subscriber("/image/mercator", Image, self.callback)
+        self.image_left_sub = rospy.Subscriber("/image/mercator_left", Image, self.callback_left)
+        self.image_sub = rospy.Subscriber("/image/mercator_right", Image, self.callback_right)
         # self.image_left_sub = rospy.Subscriber("/camera_left/rgb/image_raw_front", Image, self.callback_left_camera)
         # self.image_right_sub = rospy.Subscriber("/camera_right/rgb/image_raw_front", Image, self.callback_right_camera)
         self.vel_sub = rospy.Subscriber("/cmd_vel", Twist, self.callback_vel, queue_size=10)
@@ -44,17 +47,14 @@ class cource_following_learning_node:
         self.vel = Twist()
         self.path_pose = PoseArray()
         self.pos = PoseWithCovarianceStamped
-        self.cv_image = np.zeros((520,694,3), np.uint8)
-        self.cv_left_image = np.zeros((520,694,3), np.uint8)
-        self.cv_right_image = np.zeros((520,694,3), np.uint8)
+        self.cv_image = np.zeros((640,1280,3), np.uint8)
+        self.cv_left_image = np.zeros((640,1280,3), np.uint8)
+        self.cv_right_image = np.zeros((640,1280,3), np.uint8)
         self.learning = True
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
         self.previous_reset_time = 0
         self.start_time_s = rospy.get_time()
         self.save_img_no = 0
-        self.save_img_left_no = 1
-        self.save_img_center_no = 0
-        self.save_img_right_no = -1
         self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/'
         self.pose_x = 0
         self.pose_y = 0
@@ -70,17 +70,17 @@ class cource_following_learning_node:
     def capture_img(self):
             Flag = True
             try:
-                # cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_left_img)
-                # cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_left_center_img)
-                # cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_left_right_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_left_center_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_left_right_img)
 
                 cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_left_img)
                 cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_img)
                 cv2.imwrite(self.path + "img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_img)
 
-                # cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_right_left_img)
-                # cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_right_center_img)
-                # cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_right_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "+5" + ".jpg", self.resize_right_left_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "0" + ".jpg", self.resize_right_center_img)
+                cv2.imwrite(self.path + "img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + "-5" + ".jpg", self.resize_right_right_img)
   
             except:
                 print('Not save image')
@@ -101,13 +101,13 @@ class cource_following_learning_node:
         except CvBridgeError as e:
             print(e)
 
-    def callback_left_camera(self, data):
+    def callback_left(self, data):
         try:
             self.cv_left_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             print(e)
 
-    def callback_right_camera(self, data):
+    def callback_right(self, data):
         try:
             self.cv_right_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
@@ -132,39 +132,39 @@ class cource_following_learning_node:
         self.vel = data
         self.action = self.vel.angular.z
 
-    def callback_dl_training(self, data):
-        resp = SetBoolResponse()
-        self.learning = data.data
-        resp.message = "Training: " + str(self.learning)
-        resp.success = True
-        return resp
+    # def callback_dl_training(self, data):
+    #     resp = SetBoolResponse()
+    #     self.learning = data.data
+    #     resp.message = "Training: " + str(self.learning)
+    #     resp.success = True
+    #     return resp
 
     def loop(self):
         self.check_distance()
         if self.flag:
-            # self.crop_left_left_img = self.cv_left_image[20:500, 0:640]
-            # self.crop_left_center_img = self.cv_left_image[20:500, 27:667]
-            # self.crop_left_right_img = self.cv_left_image[20:500, 54:694]
+            self.crop_left_left_img = self.cv_left_image[80:560, 293:933]
+            self.crop_left_center_img = self.cv_left_image[80:560, 320:960]
+            self.crop_left_right_img = self.cv_left_image[80:560, 347:987]
 
-            self.crop_left_img = self.cv_image[20:500, 0:640]
-            self.crop_img = self.cv_image[20:500, 27:667]
-            self.crop_right_img = self.cv_image[20:500, 54:694]
+            self.crop_left_img = self.cv_image[80:560, 293:933]
+            self.crop_img = self.cv_image[80:560, 320:960]
+            self.crop_right_img = self.cv_image[80:560, 347:987]
 
-            # self.crop_right_left_img = self.cv_right_image[20:500, 0:640]
-            # self.crop_right_center_img = self.cv_right_image[20:500, 27:667]
-            # self.crop_right_right_img = self.cv_right_image[20:500, 54:694]
+            self.crop_right_left_img = self.cv_right_image[80:560, 293:933]
+            self.crop_right_center_img = self.cv_right_image[80:560, 320:960]
+            self.crop_right_right_img = self.cv_right_image[80:560, 347:987]
 
-            # self.resize_left_left_img = cv2.resize(self.crop_left_left_img, dsize=(64, 48))
-            # self.resize_left_center_img = cv2.resize(self.crop_left_center_img, dsize=(64, 48))
-            # self.resize_left_right_img = cv2.resize(self.crop_left_right_img, dsize=(64, 48))
+            self.resize_left_left_img = cv2.resize(self.crop_left_left_img, dsize=(64, 48))
+            self.resize_left_center_img = cv2.resize(self.crop_left_center_img, dsize=(64, 48))
+            self.resize_left_right_img = cv2.resize(self.crop_left_right_img, dsize=(64, 48))
 
             self.resize_left_img = cv2.resize(self.crop_left_img, dsize=(64, 48))
             self.resize_img = cv2.resize(self.crop_img, dsize=(64, 48))
             self.resize_right_img = cv2.resize(self.crop_right_img, dsize=(64, 48))
 
-            # self.resize_right_left_img = cv2.resize(self.crop_right_left_img, dsize=(64, 48))
-            # self.resize_right_center_img = cv2.resize(self.crop_right_center_img, dsize=(64, 48))
-            # self.resize_right_right_img = cv2.resize(self.crop_right_right_img, dsize=(64, 48))
+            self.resize_right_left_img = cv2.resize(self.crop_right_left_img, dsize=(64, 48))
+            self.resize_right_center_img = cv2.resize(self.crop_right_center_img, dsize=(64, 48))
+            self.resize_right_right_img = cv2.resize(self.crop_right_right_img, dsize=(64, 48))
 
             self.capture_img()
             self.capture_ang()
@@ -180,8 +180,10 @@ class cource_following_learning_node:
         if self.vel.linear.x == 0:
             return
 
-        if self.episode == 4000:
-            self.learning = False
+        if self.save_img_no == 400:
+            os.system("killall roslaunch")
+            sys.exit()
+            # self.learning = False
 
         # temp = copy.deepcopy(img)
         # cv2.imshow("Resized Image", temp)
