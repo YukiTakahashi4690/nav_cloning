@@ -30,3 +30,7 @@
     uri: https://github.com/YukiTakahashi4690/waypoint_nav.git
     local-name: waypoint_nav
     version: main
+- git:
+    uri: https://github.com/YukiTakahashi4690/conv_for_piechart.git
+    local-name: conv_for_piechart
+    version: main
