@@ -7,6 +7,7 @@
     - データ収集後はangフォルダとimgフォルダ内にそれぞれ角速度と画像が保存される  
 ```
 nav_cloning nav_cloning_sim.launch script:=set_collect.py use_waypoint_nav:=false
+rosservice call /collect_data  
 ```
 - データ収集（走行）
 ```
